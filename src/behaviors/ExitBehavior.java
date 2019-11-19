@@ -1,8 +1,6 @@
 package behaviors;
-
 import lejos.hardware.Button;
 import lejos.robotics.subsumption.Behavior;
-import main.Grid;
 import main.PilotRobot;
 import monitors.PCMonitor;
 import monitors.PilotMonitor;

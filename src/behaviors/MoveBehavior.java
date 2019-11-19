@@ -1,10 +1,8 @@
 package behaviors;
-import java.awt.Point;
+import java.awt.*;
 import java.util.*;
-
 import lejos.robotics.localization.OdometryPoseProvider;
-import lejos.robotics.navigation.MovePilot;
-import lejos.robotics.navigation.Pose;
+import lejos.robotics.navigation.*;
 import lejos.robotics.subsumption.Behavior;
 import main.Cell;
 import main.Grid;
@@ -21,7 +19,6 @@ public class MoveBehavior implements Behavior {
 	private PathFinder pathFinder;
 	private ArrayList<Cell> path = new ArrayList<Cell>();
 	private PCMonitor pcMonitor;
-	private boolean useSensorModel;
 	
 	private static final int HEADING_NORTH = 0;
 	private static final int HEADING_WEST = -90;

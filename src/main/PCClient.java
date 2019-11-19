@@ -1,14 +1,8 @@
 package main;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.image.BufferedImage;
+import java.awt.*;
 import java.io.*;
-import javax.swing.JPanel;
 import java.net.*;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;  
+import javax.swing.*;
 
 public class PCClient extends JFrame {
 	// bufferd reader this will connect to the socket PCMonitor.java uses
@@ -22,7 +16,6 @@ public class PCClient extends JFrame {
 	private static ImageIcon empty = new ImageIcon("empty.png");
 	
 	public static void main(String[] args) throws IOException {
-		
 		// set window size
 		myFrame.setResizable(false);
 		myFrame.setSize(1280, 640);

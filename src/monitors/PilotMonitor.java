@@ -1,8 +1,6 @@
 package monitors;
-
 import lejos.hardware.ev3.LocalEV3;
-import lejos.hardware.lcd.Font;
-import lejos.hardware.lcd.GraphicsLCD;
+import lejos.hardware.lcd.*;
 import main.Grid;
 
 public class PilotMonitor extends Thread {

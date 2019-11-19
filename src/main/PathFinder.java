@@ -1,6 +1,5 @@
 package main;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 
 public class PathFinder {
 	private ArrayList<Cell> grid;
@@ -9,7 +8,11 @@ public class PathFinder {
 		this.grid = grid;
 	}
 	
-	public ArrayList<Cell> findPath(Cell startCell, Cell destinationCell) {
+	private final int calculateHeuristicDistance(Cell a, Cell b) {
+		return Math.abs(a.getCoordinates().x - b.getCoordinates().x) + Math.abs(a.getCoordinates().y - b.getCoordinates().y);
+	}
+	
+	public final ArrayList<Cell> findPath(Cell startCell, Cell destinationCell) {
 		ArrayList<Cell> openCells = new ArrayList<Cell>(); // list of currently discovered nodes that are not yet evaluated
 		ArrayList<Cell> closedCells = new ArrayList<Cell>(); // list of nodes already evaluated
 		ArrayList<Cell> path = new ArrayList<Cell>();
@@ -80,9 +83,5 @@ public class PathFinder {
 			}
 		}
 		return null;
-	}
-	
-	private int calculateHeuristicDistance(Cell a, Cell b) {
-		return Math.abs(a.getCoordinates().x - b.getCoordinates().x) + Math.abs(a.getCoordinates().y - b.getCoordinates().y);
 	}
 }

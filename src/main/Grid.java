@@ -2,11 +2,10 @@ package main;
 import java.util.ArrayList;
 
 public class Grid {
-	private ArrayList<Cell> grid = new ArrayList<Cell>();
 	private Cell currentCell;
-	
-	private int GRID_WIDTH = 7;
-	private int GRID_HEIGHT = 6;
+	private ArrayList<Cell> grid = new ArrayList<Cell>();
+	private final int GRID_WIDTH = 7;
+	private final int GRID_HEIGHT = 6;
 	
 	public Grid() {
 		// create the grid for a specified height and width

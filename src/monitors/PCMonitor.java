@@ -1,11 +1,10 @@
 package monitors;
-import main.Cell;
-import main.Grid;
-import main.PilotRobot;
-
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import main.Cell;
+import main.Grid;
+import main.PilotRobot;
 
 // Used to send data about the robot to a PC client interface.
 public class PCMonitor extends Thread {
