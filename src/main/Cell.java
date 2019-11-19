@@ -1,60 +1,23 @@
 package main;
+import java.awt.Point;
 import java.util.*;
 
 public class Cell {
-	private int x;
-	private int y;
-	private double value;
+	private Point coordinates;
 	private boolean isBlocked = false;
-	private boolean hasBeenVisited = false;
-	private double occupancyProbability = -1; // -1: unknown, 0: empty, 1: occupied
 	private ArrayList<Cell> neighbours = new ArrayList<Cell>();
 	
 	private int f = 0; // cost estimate
 	private int g = 0; // cost of the path from the start node to the destination
 	private int h = 0; // heuristic that estimates the cost of the cheapest path from the start node to the destination
 	private Cell previousCell;
-	private int noOfSensorReadings = 0;
 	
 	public Cell (int x, int y) {
-		this.x = x;
-		this.y = y;
+		coordinates = new Point(x, y);
 	}
 	
-	public final int countUnknownNeighbours() {
-		int count = 0;
-		for (Cell neighbour : neighbours) {
-			if (neighbour.getOccupancyProbability() == -1) count++;
-		}
-		return count;
-	}
-	
-	public final String toString() {
-		return x + "," + y;
-	}
-	
-	public final int getX() {
-		return x;
-	}
-	
-	public final int getY() {
-		return y;
-	}
-	
-	public final double getValue() {
-		return value;
-	}
-	
-	public final boolean hasBeenVisited() {
-		return hasBeenVisited;
-	}
-	
-	public final double getOccupancyProbability() {
-		return occupancyProbability;
-	}
-	
-	public final ArrayList<Cell> getNeighbours() {
-		return neighbours;
+	public final Point getCoordinates() {
+		return coordinates;
 	}
 	
 	public final int getF() {
@@ -69,25 +32,16 @@ public class Cell {
 		return h;
 	}
 	
+	public final ArrayList<Cell> getNeighbours() {
+		return neighbours;
+	}
+	
 	public final Cell getPreviousCell() {
 		return previousCell;
 	}
 	
-	public final void setValue(int x, int y) {
-		double distance = Math.sqrt((y - this.y) * (y - this.y) + (x - this.x) * (x - this.x));
-		value = 4 - countUnknownNeighbours() + distance;
-	}
-	
-	public final void visit() {
-		hasBeenVisited = true;
-	}
-	
-	public final void setOccupancyProbability(double occupancyProbability) {
-		this.occupancyProbability = occupancyProbability;
-	}
-	
-	public final void setNeighbours(ArrayList<Cell> neighbours) {
-		this.neighbours = neighbours;
+	public final boolean isBlocked() {
+		return isBlocked;
 	}
 	
 	public final void setF(int f) {
@@ -102,24 +56,19 @@ public class Cell {
 		this.h = h;
 	}
 	
+	public final void setIsBlocked(boolean isBlocked) {
+		this.isBlocked = isBlocked;
+	}
+	
+	public final void setNeighbours(ArrayList<Cell> neighbours) {
+		this.neighbours = neighbours;
+	}
+	
 	public final void setPreviousCell(Cell previousCell) {
 		this.previousCell = previousCell;
 	}
 	
-	public final int getNoOfSensorReadings() {
-		return noOfSensorReadings;
-	}
-	
-	public final void addSensorReading( ) {
-		 noOfSensorReadings++;
-	}
-	
-	public final boolean isBlocked() {
-		return isBlocked;
-	}
-	
-	public final void setIsBlocked(boolean isBlocked) {
-		this.isBlocked = isBlocked;
-		setOccupancyProbability(-2);
+	public final String toString() {
+		return coordinates.x + "," + coordinates.y;
 	}
 }

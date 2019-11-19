@@ -45,27 +45,18 @@ public class PilotMonitor extends Thread {
 
 		for (int y = grid.getGridHeight() - 1; y >= 0; y--) {
 			String rowString = "|";
-			
 			for (int x = 0; x < grid.getGridWidth(); x++) {
-				double probability = grid.getCell(x, y).getOccupancyProbability();
-			
 				// display the robot's current position
 				if (grid.getCurrentCell() == grid.getCell(x, y)) {
 					rowString += " R ";
 					
-				// display if the cell is unknown
-				} else if (probability == -1) {
-					rowString += " ? ";
-					
 				// display if the cell is occupied
-				} else if (probability > 0.99) {
+				} else if (grid.getCell(x, y).isBlocked()) {
 					rowString += "|||";
-					
-				// display occupancy probability to 1 significant digit
-				} else if (probability == -2) {
-					rowString += " X ";
+				
+				// display if the cell is empty
 				} else {
-					rowString += Math.round(probability * 10) / 10.0;
+					rowString += "   ";
 				}
 				rowString += "|";
 			}

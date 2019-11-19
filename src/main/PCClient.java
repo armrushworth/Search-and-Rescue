@@ -11,22 +11,16 @@ import javax.imageio.ImageIO;
 import javax.swing.*;  
 
 public class PCClient extends JFrame {
-	
-	// java swing window
-	static JFrame myFrame = new JFrame("Robot progress"); 
-  
-	// label to display robot data 
-	static JLabel lRobotStats; 
-	static JLabel[] lOccupancyProbabilities = new JLabel[42];
-	static JLabel[] robotStates = new JLabel[42];
-	static int currentCell;
-	static String[] gridProbabilities;
-	static ImageIcon robotIcon = new ImageIcon("robot.png");
-	static ImageIcon empty = new ImageIcon("empty.png");
-	
 	// bufferd reader this will connect to the socket PCMonitor.java uses
-	static BufferedReader in;
-
+	private static BufferedReader in;
+	
+	// display robot data
+	private static JFrame myFrame = new JFrame("Robot progress"); 
+	private static JLabel lRobotStats; 
+	private static JLabel[] robotStates = new JLabel[42];
+	private static ImageIcon robotIcon = new ImageIcon("robot.png");
+	private static ImageIcon empty = new ImageIcon("empty.png");
+	
 	public static void main(String[] args) throws IOException {
 		
 		// set window size
@@ -48,11 +42,9 @@ public class PCClient extends JFrame {
 		int count = 0;
 		for (int i = 5; i >= 0; i--) {
 			for (int j = 0; j < 7; j++) {
-				gridPanels[i][j] = new JPanel(new GridLayout(3, 1));
-				lOccupancyProbabilities[count] = new JLabel("?");
+				gridPanels[i][j] = new JPanel(new GridLayout(2, 1));
 				robotStates[count] = new JLabel();
 				gridPanels[i][j].add(robotStates[count]);
-				gridPanels[i][j].add(lOccupancyProbabilities[count]);
 				
 				gridPanels[i][j].add(new JLabel("(" + j + ", " + i + ")"));
 				gridPanels[i][j].setBorder(BorderFactory.createLineBorder(Color.black));
@@ -81,28 +73,27 @@ public class PCClient extends JFrame {
 					+ "</ul>Movement information:<ul>"
 						+ "<li>Status: </li>"
 						+ "<li>Type: </li>"
-						+"<li>Heading: </li>"
+						+ "<li>Heading: </li>"
 					+ "</ul>Navigation strategy:<ul>"
 						+ "<li>Next destination: </li>"
 						+ "<li>Current path: </li>"
 					+ "</ul>");
 		
-		//IP of the robot
+		// ip of the robot
 		String ip = "192.168.70.163"; 
-		// String ip = "192.168.0.35";
 		
-		if(args.length > 0)
+		if (args.length > 0) {
 			ip = args[0];
+		}
 		
-		//Create a new socket connection with the robots PCMonitor.java.
-		Socket sock = new Socket(ip, 1234);
+		// create a new socket connection with the robots PCMonitor.java.
+		Socket socket = new Socket(ip, 1234);
 		System.out.println("Connected");
 		
-		//Get Input from PCMonitor.
-		in = new BufferedReader(
-					new InputStreamReader(sock.getInputStream()));
+		// get Input from PCMonitor.
+		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		
-		//Constantly update values.
+		// constantly update values.
 		while (true) {
 			updateValues();
 		}
@@ -118,7 +109,6 @@ public class PCClient extends JFrame {
 						+ "Sensor data:<ul>"
 							+ "<li>Sonar distance: " + in.readLine() + "</li>"
 							+ "<li>Gyro angle: " + in.readLine() + "</li>"
-							+ "<li>Corrected Gyro angle: " + in.readLine() + "</li>"
 							+ "<li>Left colour: " + in.readLine() + "</li>"
 							+ "<li>Right colour: " + in.readLine() + "</li>"
 						+ "</ul>Movement information:<ul>"
@@ -130,22 +120,12 @@ public class PCClient extends JFrame {
 							+ "<li>Current path: " + in.readLine() + "</li>"
 						+ "</ul>");
 			
-			// fill in display grid with occupation probablities and robot position.
-			gridProbabilities = in.readLine().split(",");
+			// update display grid with robot position
+			String currentCell = in.readLine();
+			int x = Integer.parseInt(currentCell.split(",")[0]);
+			int y = Integer.parseInt(currentCell.split(",")[1]);
 			
-			String currentCord = in.readLine();
-			int x = Integer.parseInt(currentCord.split(",")[0]);
-			int y = Integer.parseInt(currentCord.split(",")[1]);
-			
-			for (int i = 0; i < gridProbabilities.length; i++) {
-				if (gridProbabilities[i] == "-1.0") {
-					lOccupancyProbabilities[i].setText("?");
-				} else if (gridProbabilities[i] == "-2.0") {
-					lOccupancyProbabilities[i].setText("Unvisitable");
-				} else {
-					lOccupancyProbabilities[i].setText(gridProbabilities[i]);
-				}
-				
+			for (int i = 0; i < robotStates.length; i++) {
 				if (i == x + (5 - y) * 7) {
 					robotStates[i].setIcon(robotIcon);
 				} else {

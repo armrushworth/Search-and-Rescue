@@ -170,13 +170,4 @@ public class PilotRobot {
 	public Wheel getLeftWheel() {
 		return leftWheel;
 	}
-	
-	public float getCorrectedGyro() {
-		return correctedGyro;
-	}
-	
-	public void setCorrectedGyro(float cg) {
-		this.correctedGyro = cg;
-	}
-	
 }

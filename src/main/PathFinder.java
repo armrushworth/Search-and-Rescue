@@ -4,11 +4,9 @@ import java.util.Collections;
 
 public class PathFinder {
 	private ArrayList<Cell> grid;
-	private double occupiedCellProbability;
 	
-	public PathFinder(ArrayList<Cell> grid, double occupiedCellProbability) {
+	public PathFinder(ArrayList<Cell> grid) {
 		this.grid = grid;
-		this.occupiedCellProbability = occupiedCellProbability;
 	}
 	
 	public ArrayList<Cell> findPath(Cell startCell, Cell destinationCell) {
@@ -21,7 +19,7 @@ public class PathFinder {
 		
 		for (Cell cell : grid) {
 			// add occupied cells to closedCells
-			if (cell.getOccupancyProbability() >= occupiedCellProbability) {
+			if (cell.isBlocked()) {
 				closedCells.add(cell);
 			}
 			cell.setPreviousCell(null); // remove all previous cells
@@ -85,6 +83,6 @@ public class PathFinder {
 	}
 	
 	private int calculateHeuristicDistance(Cell a, Cell b) {
-		return Math.abs(a.getX() - b.getX()) + Math.abs(a.getY() - b.getY());
+		return Math.abs(a.getCoordinates().x - b.getCoordinates().x) + Math.abs(a.getCoordinates().y - b.getCoordinates().y);
 	}
 }

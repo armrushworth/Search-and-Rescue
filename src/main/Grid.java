@@ -1,5 +1,4 @@
 package main;
-
 import java.util.ArrayList;
 
 public class Grid {
@@ -10,26 +9,14 @@ public class Grid {
 	private int GRID_HEIGHT = 6;
 	
 	public Grid() {
-		createGrid();
-		setNeighbours();
-		setCurrentCell(getCell(0, 0));
-	}
-	
-	/**
-	 * Creates a grid of a specified height and width.
-	 */
-	private void createGrid() {
+		// create the grid for a specified height and width
 		for (int y = 0; y < GRID_HEIGHT; y++) {
 			for (int x = 0; x < GRID_WIDTH; x++) {
 				grid.add(new Cell(x, y));
 			}
 		}
-	}
-
-	/**
-	 * Populates the neighbours ArrayList for each cell in the grid.
-	 */
-	private void setNeighbours() {
+		
+		// populate the neighbours ArrayList for each cell in the grid
 		for (int y = 0; y < GRID_HEIGHT; y++) {
 			for (int x = 0; x < GRID_WIDTH; x++) {
 				ArrayList<Cell> neighbours = new ArrayList<Cell>();
@@ -40,8 +27,11 @@ public class Grid {
 				getCell(x, y).setNeighbours(neighbours);
 			}
 		}
+		
+		// TODO be able to localise automatically
+		setCurrentCell(getCell(0, 0));
 	}
-
+	
 	/**
 	 * Finds the corresponding cell for a set of provided coordinates.
 	 * @param x the x-coordinate of the cell to find
@@ -50,20 +40,15 @@ public class Grid {
 	 */
 	public final Cell getCell(int x, int y) {
 		for (Cell cell : grid) {
-			if (cell.getX() == x && cell.getY() == y) {
+			if (cell.getCoordinates().x == x && cell.getCoordinates().y == y) {
 				return cell;
 			}
 		}
 		return null;
 	}
 	
-	public final boolean areCellsUnknown() {
-		for (Cell cell : grid) {
-			if (cell.getOccupancyProbability() == -1 && !cell.isBlocked()) {
-				return true;
-			}
-		}
-		return false;
+	public final Cell getCurrentCell() {
+		return currentCell;
 	}
 	
 	public final ArrayList<Cell> getGrid() {
@@ -78,32 +63,7 @@ public class Grid {
 		return GRID_WIDTH;
 	}
 	
-	public final Cell getCurrentCell() {
-		return currentCell;
-	}
-	
 	public final void setCurrentCell(Cell currentCell) {
 		this.currentCell = currentCell;
-		currentCell.setOccupancyProbability(0);
-	}
-	
-	public int noOfOccupiedCells() {
-		int i = 0;
-		for (Cell cell: grid) {
-			if (cell.getOccupancyProbability() >= 0.7 && !cell.isBlocked()) {
-				i++;
-			}
-		}
-		return i;
-	}
-	
-	public ArrayList<Cell> getOccupiedCells() {
-		ArrayList<Cell> occupiedCells = new ArrayList<Cell>();
-		for (Cell cell : grid) {
-			if (cell.getOccupancyProbability() >= 0.7) {
-				occupiedCells.add(cell);
-			}
-		}
-		return occupiedCells;
 	}
 }

@@ -13,17 +13,15 @@ public class ExitBehavior implements Behavior{
 	private PilotRobot myRobot;
 	private PilotMonitor pilotMonitor;
 	private PCMonitor pcMonitor = null;
-	private Grid grid;
 	
-	public ExitBehavior(PilotRobot robot, PilotMonitor pilotMonitor, PCMonitor pcMonitor,Grid grid) {
-		this.myRobot = robot;
+	public ExitBehavior(PilotRobot myRobot, PilotMonitor pilotMonitor, PCMonitor pcMonitor) {
+		this.myRobot = myRobot;
 		this.pilotMonitor = pilotMonitor;
 		this.pcMonitor = pcMonitor;
-		this.grid = grid;
 	}
 	
-	public ExitBehavior(PilotRobot robot, PilotMonitor pilotMonitor) {
-		this.myRobot = robot;
+	public ExitBehavior(PilotRobot myRobot, PilotMonitor pilotMonitor) {
+		this.myRobot = myRobot;
 		this.pilotMonitor = pilotMonitor;
 	}
 	
@@ -32,9 +30,8 @@ public class ExitBehavior implements Behavior{
 	}
 	
 	public final boolean takeControl() {
-		// TODO take control when map finished and back in starting position
-		
-		return (!grid.areCellsUnknown() && grid.noOfOccupiedCells() <=4);
+		// TODO take control when all 3 victims have been found and back at hospital
+		return false;
 	}
 
 	public final void action() {
