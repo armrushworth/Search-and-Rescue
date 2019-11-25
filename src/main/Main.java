@@ -1,6 +1,8 @@
 package main;
 import behaviors.ExitBehavior;
 import behaviors.MoveBehavior;
+import colourSensorModel.ColourSampleChart;
+
 import java.io.*;
 import java.net.*;
 import lejos.robotics.subsumption.*;
@@ -11,11 +13,24 @@ public class Main {
 	private static final int PORT = 1234; // server port between pc client and robot
 	private static ServerSocket server; // server socket used between robot and pc client.
 	private static boolean usePCMonitor = true;
+//	private static boolean useColourChart = false;
 	
 	public static void main(String[] args) {
-		// initalise the grid and robot
+		// Initialise the grid and robot
 		Grid grid = new Grid();
 		PilotRobot myRobot = new PilotRobot();
+		
+		//TODO test
+//		if (useColourChart) {
+//		  //Loads previously taken and saved samples
+//		  File leftColourChartFile = new File("LeftColourChart.txt");
+//          File rightColourChartFile = new File("RightColourChart.txt");
+//		  ColourSampleChart csc = new ColourSampleChart(myRobot, leftColourChartFile, rightColourChartFile);
+//		} else {
+//		  //Generates new colour samples
+//		  ColourSampleChart csc = new ColourSampleChart(myRobot);
+//		}
+		
 		
 		// start the pilot monitor
 		PilotMonitor myMonitor = new PilotMonitor(grid);
