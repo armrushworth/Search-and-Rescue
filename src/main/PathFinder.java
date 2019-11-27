@@ -1,5 +1,7 @@
 package main;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class PathFinder {
 	private ArrayList<Cell> grid;
@@ -25,7 +27,12 @@ public class PathFinder {
 			if (cell.isBlocked()) {
 				closedCells.add(cell);
 			}
-			cell.setPreviousCell(null); // remove all previous cells
+			
+			// reset values
+			cell.setF(0);
+			cell.setG(0);
+			cell.setH(0);
+			cell.setPreviousCell(null);
 		}
 		
 		while (!isPathFound) {

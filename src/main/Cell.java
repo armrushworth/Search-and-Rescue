@@ -1,6 +1,7 @@
 package main;
+
 import java.awt.Point;
-import java.util.*;
+import java.util.ArrayList;
 
 public class Cell {
 	private Point coordinates;
@@ -56,8 +57,8 @@ public class Cell {
 		this.h = h;
 	}
 	
-	public final void setIsBlocked(boolean isBlocked) {
-		this.isBlocked = isBlocked;
+	public final void setIsBlocked() {
+		this.isBlocked = true;
 	}
 	
 	public final void setNeighbours(ArrayList<Cell> neighbours) {

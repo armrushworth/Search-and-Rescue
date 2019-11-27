@@ -1,10 +1,11 @@
 package main;
+
 import java.util.ArrayList;
 
 public class Grid {
 	private Cell currentCell;
 	private ArrayList<Cell> grid = new ArrayList<Cell>();
-	private final int GRID_WIDTH = 7;
+	private final int GRID_WIDTH = 6;
 	private final int GRID_HEIGHT = 6;
 	
 	public Grid() {
@@ -31,12 +32,7 @@ public class Grid {
 		setCurrentCell(getCell(0, 0));
 	}
 	
-	/**
-	 * Finds the corresponding cell for a set of provided coordinates.
-	 * @param x the x-coordinate of the cell to find
-	 * @param y the y-coordinate of the cell to find
-	 * @return the corresponding cell for the coordinates provided
-	 */
+	// finds the corresponding cell for a set of provided coordinates
 	public final Cell getCell(int x, int y) {
 		for (Cell cell : grid) {
 			if (cell.getCoordinates().x == x && cell.getCoordinates().y == y) {

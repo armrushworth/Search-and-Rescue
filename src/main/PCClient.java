@@ -29,12 +29,12 @@ public class PCClient extends JFrame {
 		lRobotStats = new JLabel(); 
 		
 		// create the occupancy grid panel
-		JPanel occupancyGrid = new JPanel(new GridLayout(6,7));
-		JPanel[][] gridPanels = new JPanel[6][7];
+		JPanel occupancyGrid = new JPanel(new GridLayout(6,6));
+		JPanel[][] gridPanels = new JPanel[6][6];
 		
 		int count = 0;
 		for (int i = 5; i >= 0; i--) {
-			for (int j = 0; j < 7; j++) {
+			for (int j = 0; j < 6; j++) {
 				gridPanels[i][j] = new JPanel(new GridLayout(2, 1));
 				robotStates[count] = new JLabel();
 				gridPanels[i][j].add(robotStates[count]);
@@ -119,7 +119,7 @@ public class PCClient extends JFrame {
 			int y = Integer.parseInt(currentCell.split(",")[1]);
 			
 			for (int i = 0; i < robotStates.length; i++) {
-				if (i == x + (5 - y) * 7) {
+				if (i == x + (5 - y) * 6) {
 					robotStates[i].setIcon(robotIcon);
 				} else {
 					robotStates[i].setIcon(empty);
