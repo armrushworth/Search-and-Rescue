@@ -6,10 +6,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import behaviors.CollectNonCriticalVictimBehavior;
 import behaviors.ExitBehavior;
-import behaviors.ReturnToHospitalBehavior;
-import behaviors.SearchLocationBehavior;
+import behaviors.MoveBehavior;
 import colourSensorModel.ColourSampleChart;
 import lejos.robotics.subsumption.Arbitrator;
 import lejos.robotics.subsumption.Behavior;
@@ -41,11 +39,6 @@ public class Main {
 		  ColourSampleChart csc = new ColourSampleChart(myRobot);
 		}
 		
-		
-		// start the pilot monitor
-		PilotMonitor myMonitor = new PilotMonitor(grid);
-		myMonitor.start();
-		
 		// start the pc monitor
 		PCMonitor pcMonitor = null;
 		if (usePCMonitor) {
@@ -60,8 +53,12 @@ public class Main {
 			pcMonitor.start();
 		}
 		
+		// start the pilot monitor
+		PilotMonitor myMonitor = new PilotMonitor(grid);
+		myMonitor.start();
+		
 		// TODO replace with AgentSpeak logic
-		int bayNumber = 1;
+		int bayNumber = 4;
 		switch (bayNumber) {
 			case 1:
 				grid.getCell(1, 1).setIsBlocked();
@@ -111,11 +108,9 @@ public class Main {
 		route = hungarianMethod.findRoute();
 		
 		// set up the behaviours for the arbitrator and construct it
-		Behavior b1 = usePCMonitor ? new SearchLocationBehavior(myRobot, grid, pcMonitor) : new SearchLocationBehavior(myRobot, grid);
-		Behavior b2 = new CollectNonCriticalVictimBehavior();
-		Behavior b3 = new ReturnToHospitalBehavior();
-		Behavior b4 = usePCMonitor ? new ExitBehavior(myRobot, myMonitor, pcMonitor) : new ExitBehavior(myRobot, myMonitor);
-		Behavior [] behaviorArray = {b1, b2, b3, b4};
+		Behavior b1 = usePCMonitor ? new MoveBehavior(myRobot, grid, route, pcMonitor) : new MoveBehavior(myRobot, grid, route);
+		Behavior b2 = usePCMonitor ? new ExitBehavior(myRobot, route, myMonitor, pcMonitor) : new ExitBehavior(myRobot, route, myMonitor);
+		Behavior [] behaviorArray = {b1, b2};
 		Arbitrator arbitrator = new Arbitrator(behaviorArray);
 		arbitrator.go();
 	}

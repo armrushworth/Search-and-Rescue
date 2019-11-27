@@ -10,12 +10,13 @@ import main.PathFinder;
 import main.PilotRobot;
 import monitors.PCMonitor;
 
-public class SearchLocationBehavior implements Behavior {
+public class MoveBehavior implements Behavior {
 	private boolean suppressed = false;
 	private PilotRobot myRobot;
 	private MovePilot myPilot;
 	private OdometryPoseProvider opp;
 	private Grid grid;
+	private ArrayList<Cell> route;
 	private PathFinder pathFinder;
 	private ArrayList<Cell> path = new ArrayList<Cell>();
 	private PCMonitor pcMonitor;
@@ -25,23 +26,25 @@ public class SearchLocationBehavior implements Behavior {
 	private static final int HEADING_EAST = 90;
 	private static final int HEADING_SOUTH = 180;
 	
-	public SearchLocationBehavior(PilotRobot myRobot, Grid grid, PCMonitor pcMonitor) {
+	public MoveBehavior(PilotRobot myRobot, Grid grid, ArrayList<Cell> route, PCMonitor pcMonitor) {
 		this.myRobot = myRobot;
 		myPilot = myRobot.getPilot();
 		opp = myRobot.getOdometryPoseProvider();
 		
 		this.grid = grid;
+		this.route = route;
 		pathFinder = new PathFinder(grid.getGrid());
 		
 		this.pcMonitor = pcMonitor;
 	}
 	
-	public SearchLocationBehavior(PilotRobot myRobot, Grid grid) {
+	public MoveBehavior(PilotRobot myRobot, Grid grid, ArrayList<Cell> route) {
 		this.myRobot = myRobot;
 		myPilot = myRobot.getPilot();
 		opp = myRobot.getOdometryPoseProvider();
 		
 		this.grid = grid;
+		this.route = route;
 		pathFinder = new PathFinder(grid.getGrid());
 	}
 	
@@ -60,7 +63,7 @@ public class SearchLocationBehavior implements Behavior {
 		// select a destination and build the path
 		if (path.isEmpty()) {
 			// TODO calculate destination
-			destination = grid.getCell(5, 5);
+			destination = route.remove(0);
 			pcMonitor.setPath(path);
 			path = pathFinder.findPath(grid.getCurrentCell(), destination);
 			pcMonitor.setDestination(destination);
