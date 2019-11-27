@@ -10,7 +10,7 @@ import main.PathFinder;
 import main.PilotRobot;
 import monitors.PCMonitor;
 
-public class MoveBehavior implements Behavior {
+public class SearchLocationBehavior implements Behavior {
 	private boolean suppressed = false;
 	private PilotRobot myRobot;
 	private MovePilot myPilot;
@@ -25,7 +25,7 @@ public class MoveBehavior implements Behavior {
 	private static final int HEADING_EAST = 90;
 	private static final int HEADING_SOUTH = 180;
 	
-	public MoveBehavior(PilotRobot myRobot, Grid grid, PCMonitor pcMonitor) {
+	public SearchLocationBehavior(PilotRobot myRobot, Grid grid, PCMonitor pcMonitor) {
 		this.myRobot = myRobot;
 		myPilot = myRobot.getPilot();
 		opp = myRobot.getOdometryPoseProvider();
@@ -36,7 +36,7 @@ public class MoveBehavior implements Behavior {
 		this.pcMonitor = pcMonitor;
 	}
 	
-	public MoveBehavior(PilotRobot myRobot, Grid grid) {
+	public SearchLocationBehavior(PilotRobot myRobot, Grid grid) {
 		this.myRobot = myRobot;
 		myPilot = myRobot.getPilot();
 		opp = myRobot.getOdometryPoseProvider();
@@ -60,7 +60,7 @@ public class MoveBehavior implements Behavior {
 		// select a destination and build the path
 		if (path.isEmpty()) {
 			// TODO calculate destination
-			destination = grid.getCell(6, 5);
+			destination = grid.getCell(5, 5);
 			pcMonitor.setPath(path);
 			path = pathFinder.findPath(grid.getCurrentCell(), destination);
 			pcMonitor.setDestination(destination);
@@ -71,7 +71,7 @@ public class MoveBehavior implements Behavior {
 			Cell nextStep = path.remove(0);
 			followPath(nextStep.getCoordinates());
 		} else {
-			destination.setIsBlocked(true);
+			destination.setIsBlocked();
 		}
 	}
 	
