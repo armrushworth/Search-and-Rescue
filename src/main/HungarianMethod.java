@@ -27,7 +27,6 @@ public class HungarianMethod {
 	}
 	
 	public final ArrayList<Cell> findRoute() {
-		printDataMatrix();
 		for (int i = 0; i < potentialVictims.size(); i++) {
 			subtractLowestRowValue();
 			subtractLowestColumnValue();
@@ -40,7 +39,7 @@ public class HungarianMethod {
 			index = graph.get(index).get(0);
 			route.add(locations.get(index));
 		}
-		printRoute();
+		route.remove(0);
 		return route;
 	}
 	
