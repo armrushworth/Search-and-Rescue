@@ -7,19 +7,22 @@ import javax.swing.*;
 public class PCClient extends JFrame {
 	// bufferd reader this will connect to the socket PCMonitor.java uses
 	private static BufferedReader in;
+	private static BufferedReader errorIn;
 	
 	// display robot data
 	private static JFrame myFrame = new JFrame("Robot progress"); 
 	private static JLabel lRobotStats; 
-	private static JLabel[] robotStates = new JLabel[42];
-	private static ImageIcon robotIcon = new ImageIcon("robot.png");
-	private static ImageIcon empty = new ImageIcon("empty.png");
+	private static JLabel errorDisplay;
+	private static JLabel[] robotStates = new JLabel[36];
+	private static ImageIcon robotIcon;
+	private static ImageIcon empty;
 	
 	public static void main(String[] args) throws IOException {
 		// set window size
 		myFrame.setResizable(false);
 		myFrame.setSize(1280, 640);
-
+		robotIcon = new ImageIcon("../images/robot.png");
+		empty = new ImageIcon("../images/empty.png");
 		// create master panel
 		JPanel masterPanel = new JPanel();
 		masterPanel.setLayout(new GridLayout(1, 2));
@@ -27,6 +30,7 @@ public class PCClient extends JFrame {
 		// create robot stats panel
 		JPanel robotStats = new JPanel();
 		lRobotStats = new JLabel(); 
+		errorDisplay = new JLabel();
 		
 		// create the occupancy grid panel
 		JPanel occupancyGrid = new JPanel(new GridLayout(6,6));
@@ -48,6 +52,7 @@ public class PCClient extends JFrame {
 		
 		// add label to panel 
 		robotStats.add(lRobotStats); 
+		robotStats.add(errorDisplay);
 		masterPanel.add(robotStats);
 		masterPanel.add(occupancyGrid);
 		
@@ -71,6 +76,7 @@ public class PCClient extends JFrame {
 						+ "<li>Next destination: </li>"
 						+ "<li>Current path: </li>"
 					+ "</ul>");
+		errorDisplay.setText("No errors");
 		
 		// ip of the robot
 		String ip = "192.168.70.163"; 
@@ -81,10 +87,13 @@ public class PCClient extends JFrame {
 		
 		// create a new socket connection with the robots PCMonitor.java.
 		Socket socket = new Socket(ip, 1234);
-		System.out.println("Connected");
+		System.out.println("Connected1");
+		Socket errorSocket = new Socket(ip, 1111);
+		System.out.println("Connected2");
 		
 		// get Input from PCMonitor.
 		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		errorIn = new BufferedReader(new InputStreamReader(errorSocket.getInputStream()));
 		
 		// constantly update values.
 		while (true) {
@@ -112,12 +121,10 @@ public class PCClient extends JFrame {
 							+ "<li>Next destination: " + in.readLine() + "</li>"
 							+ "<li>Current path: " + in.readLine() + "</li>"
 						+ "</ul>");
-			
 			// update display grid with robot position
 			String currentCell = in.readLine();
 			int x = Integer.parseInt(currentCell.split(",")[0]);
 			int y = Integer.parseInt(currentCell.split(",")[1]);
-			
 			for (int i = 0; i < robotStates.length; i++) {
 				if (i == x + (5 - y) * 6) {
 					robotStates[i].setIcon(robotIcon);
@@ -125,9 +132,12 @@ public class PCClient extends JFrame {
 					robotStates[i].setIcon(empty);
 				}
 			}
-			
+			if (errorIn.ready() && errorIn.readLine() != null) {
+				errorDisplay.setText(errorIn.readLine());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			errorDisplay.setText(e.getMessage());
 		}
 	}
 }

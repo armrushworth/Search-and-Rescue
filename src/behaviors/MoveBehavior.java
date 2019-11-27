@@ -1,6 +1,8 @@
 package behaviors;
 import java.awt.*;
 import java.util.*;
+
+import colourSensorModel.ColourSampleChart;
 import lejos.robotics.localization.OdometryPoseProvider;
 import lejos.robotics.navigation.*;
 import lejos.robotics.subsumption.Behavior;
@@ -20,16 +22,18 @@ public class MoveBehavior implements Behavior {
 	private PathFinder pathFinder;
 	private ArrayList<Cell> path = new ArrayList<Cell>();
 	private PCMonitor pcMonitor;
+	private ColourSampleChart csc;
 	
 	private static final int HEADING_NORTH = 0;
 	private static final int HEADING_WEST = -90;
 	private static final int HEADING_EAST = 90;
 	private static final int HEADING_SOUTH = 180;
 	
-	public MoveBehavior(PilotRobot myRobot, Grid grid, ArrayList<Cell> route, PCMonitor pcMonitor) {
+	public MoveBehavior(PilotRobot myRobot, Grid grid, ArrayList<Cell> route, PCMonitor pcMonitor, ColourSampleChart csc) {
 		this.myRobot = myRobot;
 		myPilot = myRobot.getPilot();
 		opp = myRobot.getOdometryPoseProvider();
+		this.csc = csc;
 		
 		this.grid = grid;
 		this.route = route;
@@ -38,10 +42,11 @@ public class MoveBehavior implements Behavior {
 		this.pcMonitor = pcMonitor;
 	}
 	
-	public MoveBehavior(PilotRobot myRobot, Grid grid, ArrayList<Cell> route) {
+	public MoveBehavior(PilotRobot myRobot, Grid grid, ArrayList<Cell> route, ColourSampleChart csc) {
 		this.myRobot = myRobot;
 		myPilot = myRobot.getPilot();
 		opp = myRobot.getOdometryPoseProvider();
+		this.csc = csc;
 		
 		this.grid = grid;
 		this.route = route;
@@ -227,10 +232,10 @@ public class MoveBehavior implements Behavior {
 	}
 	
 	public boolean leftOnLine() {
-		return myRobot.getLeftColor()[0] == 7;
+		return csc.findColor(myRobot.getLeftColor(), true) == "Black";
 	}
 	
 	public boolean rightOnLine() {
-		return myRobot.getRightColor()[0] == 7;
+		return csc.findColor(myRobot.getRightColor(), false) == "Black";
 	}
 }

@@ -2,6 +2,8 @@ package monitors;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+
+import colourSensorModel.ColourSampleChart;
 import main.Cell;
 import main.Grid;
 import main.PilotRobot;
@@ -11,28 +13,36 @@ public class PCMonitor extends Thread {
 
 	//Server socket between robot and client
 	private Socket client;
+	private Socket errorSocket;
 
 	//checks if thread is running.
 	private volatile boolean running = true;
 
 	//Data output stream
 	private PrintWriter out;
+	private PrintWriter errorDisplay;
 
 	//The actual robot.
 	private PilotRobot robot;
 
 	private Grid grid;
 	
+	private ColourSampleChart csc;
+	
 	private Cell destination = null;
 	private ArrayList<Cell> path = new ArrayList<Cell>();
 
-	public PCMonitor(Socket client, PilotRobot robot, Grid grid) {
+	public PCMonitor(Socket client, Socket errorSocket, PilotRobot robot, Grid grid, ColourSampleChart csc) {
 		this.client = client;
+		this.errorSocket = errorSocket;
 		this.robot = robot;
 		this.grid = grid;
+		this.csc = csc;
 		
 		try {
 			out = new PrintWriter(client.getOutputStream(), true);
+			errorDisplay = new PrintWriter(errorSocket.getOutputStream(), true);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 			running = false;
@@ -46,8 +56,8 @@ public class PCMonitor extends Thread {
 			// output sensor information
 			out.println(robot.getDistance());
 			out.println(robot.getAngle());
-			out.println(robot.getLeftColor()[0]);
-			out.println(robot.getRightColor()[0]);
+			out.println(csc.findColor(robot.getLeftColor(),true));
+			out.println(csc.findColor(robot.getRightColor(),false));
 			
 			// ouptut movement information
 			if (robot.getPilot().isMoving()) {
@@ -84,6 +94,12 @@ public class PCMonitor extends Thread {
 				e.printStackTrace();
 				running = false;
 			}
+		}
+	}
+	
+	public final void sendError(Exception error) {
+		if (error != null) {
+			errorDisplay.println(error.getMessage());
 		}
 	}
 	

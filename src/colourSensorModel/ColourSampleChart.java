@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import lejos.hardware.Button;
 import lejos.hardware.lcd.GraphicsLCD;
@@ -50,16 +51,17 @@ public class ColourSampleChart {
   private double[] nearestDistances;
   
   //The number of separate readings needed per colour
-  private final int noOfScans = 4; 
+  private final int noOfScans = 8; 
   
   //The number of samples to take for ever scan.
-  private final int sampleSizePerReading = 25;
+  private final int sampleSizePerReading = (int) Math.ceil(100/noOfScans);
   
   //All colours that need to be distinguished by the robot.
   private final String[] colours = {"Black", "White", "Cyan", "Burgundy", "Yellow", "Green"};
   
   //The value k in the k nearest neighbour algorithm 
   private int k; 
+  public IOException recentError;
 
   
   /**
@@ -69,11 +71,13 @@ public class ColourSampleChart {
    */
   public ColourSampleChart(PilotRobot pr) {
     //Sets k to a multiple of the number of colours that are clustered.
-    k = colours.length*2;
+    k = colours.length*4;
     this.pilotRobot = pr;
     
     //Generates a new colour graph.
     takeReadings();
+    saveChartToFile(true);
+    saveChartToFile(false);
   }
   
   /**
@@ -84,7 +88,7 @@ public class ColourSampleChart {
    */
   public ColourSampleChart(PilotRobot pr, File savedLeftColourChart, File savedRightColourChart) {
     this.pilotRobot = pr;
-    
+    k = colours.length*4;
     //Read left file
     //Initialise a buffered reader and read through the colour file and generate the colour graph/list.
     BufferedReader reader;
@@ -108,6 +112,7 @@ public class ColourSampleChart {
       }
       reader.close();
     } catch (IOException e) {
+      recentError = e;
       e.printStackTrace();
     };
     
@@ -132,7 +137,8 @@ public class ColourSampleChart {
       }
       reader.close();
     } catch (IOException e) {
-      e.printStackTrace();
+    	recentError = e;
+    	e.printStackTrace();
     };
   }
   
@@ -179,29 +185,47 @@ public class ColourSampleChart {
     nearestDistances = new double[k];
     
     //Set the first k labelled colour samples in the graph to be the initial nearest neighbours.
-    for (int i = 0; i < k; i++) {
-      if (leftSensor) {
-        nearestDistances[i] = leftColourSamples.get(i).getVectorDistance(colourSample);
-        nearestColours[i] = i;
-      } else {
-        nearestDistances[i] = rightColourSamples.get(i).getVectorDistance(colourSample);
-        nearestColours[i] = i;
-      }
-
-    }
+//    for (int i = 0; i < k; i++) {
+//      if (leftSensor) {
+//        nearestDistances[i] = leftColourSamples.get(i).getVectorDistance(colourSample);
+//        nearestColours[i] = i;
+//      } else {
+//        nearestDistances[i] = rightColourSamples.get(i).getVectorDistance(colourSample);
+//        nearestColours[i] = i;
+//      }
+//
+//    }
     
-    /*For every remaining labelled colour sample check if its vector distance is closer than any of the
-     *  current nearest neighbours.*/
-    //Both left and right colour sample lists will be the same length.
-    for (int i = k; i < leftColourSamples.size(); i++) {
-      double vectorDistance = Double.POSITIVE_INFINITY;
-      if (leftSensor) {
-        vectorDistance = leftColourSamples.get(i).getVectorDistance(colourSample);
-      } else {
-        vectorDistance = rightColourSamples.get(i).getVectorDistance(colourSample);
-      }
-      checkIfShorter(vectorDistance, i);
+    for (int i = 0; i < leftColourSamples.size(); i++) {
+    	if (leftSensor) {
+    	  leftColourSamples.get(i).getVectorDistance(colourSample);
+    	} else {
+    	  rightColourSamples.get(i).getVectorDistance(colourSample);
+    	}
     }
+    if (leftSensor) {
+    	System.out.println(leftColourSamples.get(0).getColourLabel());
+    	System.out.println(leftColourSamples.get(leftColourSamples.size()-1).getColourLabel());
+    	Collections.sort(leftColourSamples);
+    	System.out.println(leftColourSamples.get(0).getColourLabel());
+    	System.out.println(leftColourSamples.get(leftColourSamples.size()-1).getColourLabel());
+    } else {
+        Collections.sort(rightColourSamples);
+    }
+
+//    
+//    /*For every remaining labelled colour sample check if its vector distance is closer than any of the
+//     *  current nearest neighbours.*/
+//    //Both left and right colour sample lists will be the same length.
+//    for (int i = k; i < leftColourSamples.size(); i++) {
+//      double vectorDistance = Double.POSITIVE_INFINITY;
+//      if (leftSensor) {
+//        vectorDistance = leftColourSamples.get(i).getVectorDistance(colourSample);
+//      } else {
+//        vectorDistance = rightColourSamples.get(i).getVectorDistance(colourSample);
+//      }
+//      checkIfShorter(vectorDistance, i);
+//    }
     
     //Stores the number of times a certain colour is a nearest neighbour. 
     int[] totalNeighbours = new int[colours.length];
@@ -216,33 +240,27 @@ public class ColourSampleChart {
       for (int j = 0; j < totalNeighbours.length; j++) {
         if (leftSensor) {
           //check if colour k is equal to nearest neighbour j.
-          if (leftColourSamples.get(nearestColours[i]).getColourLabel().equals(colours[j])) {
+          if (leftColourSamples.get(i).getColourLabel().equals(colours[j])) {
             totalNeighbours[j]++;
           }
         } else {
-          if (rightColourSamples.get(nearestColours[i]).getColourLabel().equals(colours[j])) {
+          if (rightColourSamples.get(i).getColourLabel().equals(colours[j])) {
             totalNeighbours[j]++;
           }
         }
       }
     }
     
-    //keeps track of the highest nearest neighbour occurrence.
-    int highestProbability = 0;
-    
     //Keeps track of which colour has the highest nearest neighbour occurrence.
-    int highestProbabilityIndex = 0;
+    int highestIndex = 0;
     
     //For every colour find which colour has the highest occurrence of nearest neighbours
-    for (int i = 0; i < colours.length; i++) {
-      if (totalNeighbours[i] > highestProbability) {
-        highestProbability = totalNeighbours[i];
-        highestProbabilityIndex = i;
-      }
+    for (int i = 0; i < totalNeighbours.length; i++) {
+      if (totalNeighbours[i] > totalNeighbours[highestIndex]) highestIndex = i;
     }
     
     //Return the colour with the highest number of nearest neighbours 
-    return(colours[highestProbabilityIndex]);
+    return(colours[highestIndex]);
   }
   
   /**
@@ -250,22 +268,22 @@ public class ColourSampleChart {
    * @param vectorDistance The distance between the new sample and labelled colour samples plotting on the colour chart.
    * @param index The index of the labelled colour sample being compared.
    */
-  public void checkIfShorter(double vectorDistance, int index) {
-    for (int i = 0; i < k; i++) {
-      if (vectorDistance < nearestDistances[i]) {
-        
-        //swap new nearestNeighbour with the current nearest neighbour at index i in the NN list.
-        double tempDistance = nearestDistances[i];
-        int tempIndex = nearestColours[i];
-        nearestDistances[i] = vectorDistance;
-        nearestColours[i] = index;
-        
-        //Check if the swapped out NN is smaller than any other items on the list.
-        checkIfShorter(tempDistance,tempIndex);
-        break;
-      }
-    }
-  }
+//  public void checkIfShorter(double vectorDistance, int index) {
+//    for (int i = 0; i < k; i++) {
+//      if (vectorDistance < nearestDistances[i]) {
+//        
+//        //swap new nearestNeighbour with the current nearest neighbour at index i in the NN list.
+//        double tempDistance = nearestDistances[i];
+//        int tempIndex = nearestColours[i];
+//        nearestDistances[i] = vectorDistance;
+//        nearestColours[i] = index;
+//        
+//        //Check if the swapped out NN is smaller than any other items on the list.
+//        checkIfShorter(tempDistance,tempIndex);
+//        break;
+//      }
+//    }
+//  }
   
   /**
    * Every time a new data is collected for a fresh colour graph it gets saved to a text file.
@@ -289,6 +307,7 @@ public class ColourSampleChart {
         } else {
           lcs = rightColourSamples.get(i);
         }
+        System.out.println((i + " of " + leftColourSamples.size()));
          
         writer.println(
             lcs.getColourLabel() + "," +

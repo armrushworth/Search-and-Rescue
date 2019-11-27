@@ -33,10 +33,10 @@ public class PilotRobot {
 	// set up the color sensors
 	private void setupColorSensors() {
 		leftColorSensor = new EV3ColorSensor(ev3.getPort("S1"));
-		leftColorSampleProvider = leftColorSensor.getColorIDMode();
+		leftColorSampleProvider = leftColorSensor.getRGBMode();
 		leftColorSample = new float[leftColorSampleProvider.sampleSize()];
 		rightColorSensor = new EV3ColorSensor(ev3.getPort("S4"));
-		rightColorSampleProvider = rightColorSensor.getColorIDMode();
+		rightColorSampleProvider = rightColorSensor.getRGBMode();
 		rightColorSample = new float[rightColorSampleProvider.sampleSize()];
 	}
 	

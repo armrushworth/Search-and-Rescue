@@ -18,7 +18,7 @@ public class Main {
 	private static final int PORT = 1234; // server port between pc client and robot
 	private static ServerSocket server; // server socket used between robot and pc client.
 	private static boolean usePCMonitor = true;
-	private static boolean useColourChart = false;
+	private static boolean useColourChart = true;
 	private static ArrayList<Cell> potentialVictims = new ArrayList<Cell>();
 	private static HungarianMethod hungarianMethod;
 	private static ArrayList<Cell> route;
@@ -27,32 +27,38 @@ public class Main {
 		// Initialise the grid and robot
 		Grid grid = new Grid();
 		PilotRobot myRobot = new PilotRobot();
-		
+		ColourSampleChart csc;
 		//TODO test
 		if (useColourChart) {
 		  //Loads previously taken and saved samples
 		  File leftColourChartFile = new File("LeftColourChart.txt");
           File rightColourChartFile = new File("RightColourChart.txt");
-		  ColourSampleChart csc = new ColourSampleChart(myRobot, leftColourChartFile, rightColourChartFile);
+		  csc = new ColourSampleChart(myRobot, leftColourChartFile, rightColourChartFile);
 		} else {
 		  //Generates new colour samples
-		  ColourSampleChart csc = new ColourSampleChart(myRobot);
+		  csc = new ColourSampleChart(myRobot);
 		}
 		
 		// start the pc monitor
 		PCMonitor pcMonitor = null;
 		if (usePCMonitor) {
 			try {
+				System.out.println("Awaiting client 1..");
 				server = new ServerSocket(PORT);
-				System.out.println("Awaiting client..");
 				Socket client = server.accept();
-				pcMonitor = new PCMonitor(client, myRobot, grid);
+				System.out.println("Awaiting client 2..");
+				ServerSocket errorServer = new ServerSocket(1111);
+				Socket errorClient = errorServer.accept();
+				
+				pcMonitor = new PCMonitor(client, errorClient, myRobot, grid, csc);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			pcMonitor.start();
+			pcMonitor.sendError(csc.recentError);
+
 		}
-		
+		myRobot.resetGyro();
 		// start the pilot monitor
 		PilotMonitor myMonitor = new PilotMonitor(grid);
 		myMonitor.start();
@@ -108,7 +114,7 @@ public class Main {
 		route = hungarianMethod.findRoute();
 		
 		// set up the behaviours for the arbitrator and construct it
-		Behavior b1 = usePCMonitor ? new MoveBehavior(myRobot, grid, route, pcMonitor) : new MoveBehavior(myRobot, grid, route);
+		Behavior b1 = usePCMonitor ? new MoveBehavior(myRobot, grid, route, pcMonitor, csc) : new MoveBehavior(myRobot, grid, route, csc);
 		Behavior b2 = usePCMonitor ? new ExitBehavior(myRobot, route, myMonitor, pcMonitor) : new ExitBehavior(myRobot, route, myMonitor);
 		Behavior [] behaviorArray = {b1, b2};
 		Arbitrator arbitrator = new Arbitrator(behaviorArray);

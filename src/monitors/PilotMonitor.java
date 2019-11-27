@@ -34,10 +34,10 @@ public class PilotMonitor extends Thread {
 	 */
 	private void updateMap() {
 		//this is the only way i could stop the lcd screen overlaping text might revisit
-		for (int i = 0; i < 9; i++) {
-			System.out.println("");
-			System.out.flush();
-		}
+//		for (int i = 0; i < 9; i++) {
+//			System.out.println("");
+//			System.out.flush();
+//		}
 		int rowCounter = 1;
 		lcd.drawString("+---+---+---+---+---+---+---+", 0, 0, 0);
 

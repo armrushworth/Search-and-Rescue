@@ -5,7 +5,7 @@ package colourSensorModel;
  * @author James Daniels
  *
  */
-public class LabelledColourSample {
+public class LabelledColourSample implements Comparable<LabelledColourSample>{
 
   //This point has an associated colourLabel which represents the colour the RGB value is known to represent.
   private String colourLabel;
@@ -18,6 +18,8 @@ public class LabelledColourSample {
   
   //Z coordinate is the RGB blue value.
   private float green;
+  
+  private double distance;
   
   /**
    * Constructor a float array is used since this how RGB values are returned when using the Ev3 colour sensor.
@@ -71,11 +73,28 @@ public class LabelledColourSample {
    * @return The vector distance between a the new sample and this labelled colour sample.
    */
   public double getVectorDistance(float[] colourSample) { 
-    return Math.sqrt(
+	  distance = Math.sqrt(
         Math.pow((red - colourSample[0]), 2) +
         Math.pow((green - colourSample[1]), 2) +
         Math.pow((blue - colourSample[2]), 2)
         );
+	  if (Double.isNaN(distance)) {
+		  distance = Double.POSITIVE_INFINITY;
+		  return Double.POSITIVE_INFINITY;
+	  }
+	  return distance;
   }
+  
+  public double getDistance() {
+	  return this.distance;
+  }
+
+@Override
+public int compareTo(LabelledColourSample lcs2) {
+	double dif = this.distance - lcs2.getDistance();
+	if (dif > 0.000000001) return 1;
+	if (dif < -0.000000001) return -1;
+	return 0;
+}
  
 }
