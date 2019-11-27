@@ -1,17 +1,13 @@
 package main;
+import behaviors.ExitBehavior;
+import behaviors.MoveBehavior;
+import colourSensorModel.ColourSampleChart;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.io.*;
+import java.net.*;
 import java.util.ArrayList;
 
-import behaviors.CollectNonCriticalVictimBehavior;
-import behaviors.ExitBehavior;
-import behaviors.ReturnToHospitalBehavior;
-import behaviors.SearchLocationBehavior;
-import colourSensorModel.ColourSampleChart;
-import lejos.robotics.subsumption.Arbitrator;
-import lejos.robotics.subsumption.Behavior;
+import lejos.robotics.subsumption.*;
 import monitors.PCMonitor;
 import monitors.PilotMonitor;
 
@@ -110,11 +106,9 @@ public class Main {
 		route = hungarianMethod.findRoute();
 		
 		// set up the behaviours for the arbitrator and construct it
-		Behavior b1 = usePCMonitor ? new SearchLocationBehavior(myRobot, grid, pcMonitor) : new SearchLocationBehavior(myRobot, grid);
-		Behavior b2 = new CollectNonCriticalVictimBehavior();
-		Behavior b3 = new ReturnToHospitalBehavior();
-		Behavior b4 = usePCMonitor ? new ExitBehavior(myRobot, myMonitor, pcMonitor) : new ExitBehavior(myRobot, myMonitor);
-		Behavior [] behaviorArray = {b1, b2, b3, b4};
+		Behavior b1 = usePCMonitor ? new MoveBehavior(myRobot, grid, pcMonitor) : new MoveBehavior(myRobot, grid);
+		Behavior b2 = usePCMonitor ? new ExitBehavior(myRobot, myMonitor, pcMonitor) : new ExitBehavior(myRobot, myMonitor);
+		Behavior [] behaviorArray = {b1, b2};
 		Arbitrator arbitrator = new Arbitrator(behaviorArray);
 		arbitrator.go();
 	}
