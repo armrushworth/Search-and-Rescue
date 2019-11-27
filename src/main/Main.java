@@ -1,5 +1,6 @@
 package main;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -19,7 +20,7 @@ public class Main {
 	private static final int PORT = 1234; // server port between pc client and robot
 	private static ServerSocket server; // server socket used between robot and pc client.
 	private static boolean usePCMonitor = true;
-//	private static boolean useColourChart = false;
+	private static boolean useColourChart = false;
 	private static ArrayList<Cell> potentialVictims = new ArrayList<Cell>();
 	private static HungarianMethod hungarianMethod;
 	private static ArrayList<Cell> route;
@@ -30,15 +31,15 @@ public class Main {
 		PilotRobot myRobot = new PilotRobot();
 		
 		//TODO test
-//		if (useColourChart) {
-//		  //Loads previously taken and saved samples
-//		  File leftColourChartFile = new File("LeftColourChart.txt");
-//          File rightColourChartFile = new File("RightColourChart.txt");
-//		  ColourSampleChart csc = new ColourSampleChart(myRobot, leftColourChartFile, rightColourChartFile);
-//		} else {
-//		  //Generates new colour samples
-//		  ColourSampleChart csc = new ColourSampleChart(myRobot);
-//		}
+		if (useColourChart) {
+		  //Loads previously taken and saved samples
+		  File leftColourChartFile = new File("LeftColourChart.txt");
+          File rightColourChartFile = new File("RightColourChart.txt");
+		  ColourSampleChart csc = new ColourSampleChart(myRobot, leftColourChartFile, rightColourChartFile);
+		} else {
+		  //Generates new colour samples
+		  ColourSampleChart csc = new ColourSampleChart(myRobot);
+		}
 		
 		
 		// start the pilot monitor
