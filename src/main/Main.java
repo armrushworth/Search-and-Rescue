@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import behaviors.ExitBehavior;
 import behaviors.MoveBehavior;
+import behaviors.SelectDestinationBehavior;
 import colourSensorModel.ColourSampleChart;
 import lejos.robotics.subsumption.Arbitrator;
 import lejos.robotics.subsumption.Behavior;
@@ -17,11 +18,10 @@ import monitors.PilotMonitor;
 public class Main {
 	private static final int PORT = 1234; // server port between pc client and robot
 	private static ServerSocket server; // server socket used between robot and pc client.
-	private static boolean usePCMonitor = true;
 	private static boolean useColourChart = true;
 	private static ArrayList<Cell> potentialVictims = new ArrayList<Cell>();
-	private static HungarianMethod hungarianMethod;
-	private static ArrayList<Cell> route;
+	private static ArrayList<Cell> route = new ArrayList<Cell>();
+	private static ArrayList<Cell> path = new ArrayList<Cell>();
 	
 	public static void main(String[] args) {
 	    System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
@@ -29,37 +29,39 @@ public class Main {
 		Grid grid = new Grid();
 		PilotRobot myRobot = new PilotRobot();
 		ColourSampleChart csc;
+		
 		//TODO test
 		if (useColourChart) {
-		  //Loads previously taken and saved samples
-		  File leftColourChartFile = new File("LeftColourChart.txt");
-          File rightColourChartFile = new File("RightColourChart.txt");
-		  csc = new ColourSampleChart(myRobot, leftColourChartFile, rightColourChartFile);
+			//Loads previously taken and saved samples
+			File leftColourChartFile = new File("LeftColourChart.txt");
+			File rightColourChartFile = new File("RightColourChart.txt");
+			csc = new ColourSampleChart(myRobot, leftColourChartFile, rightColourChartFile);
 		} else {
-		  //Generates new colour samples
-		  csc = new ColourSampleChart(myRobot);
+			//Generates new colour samples
+			csc = new ColourSampleChart(myRobot);
 		}
 		
 		// start the pc monitor
 		PCMonitor pcMonitor = null;
-		if (usePCMonitor) {
-			try {
-				System.out.println("Awaiting client 1..");
-				server = new ServerSocket(PORT);
-				Socket client = server.accept();
-				System.out.println("Awaiting client 2..");
-				ServerSocket errorServer = new ServerSocket(1111);
-				Socket errorClient = errorServer.accept();
-				
-				pcMonitor = new PCMonitor(client, errorClient, myRobot, grid, csc);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			pcMonitor.start();
-			pcMonitor.sendError(csc.recentError);
-
+		try {
+			System.out.println("Awaiting client 1..");
+			server = new ServerSocket(PORT);
+			Socket client = server.accept();
+			System.out.println("Awaiting client 2..");
+			ServerSocket errorServer = new ServerSocket(1111);
+			Socket errorClient = errorServer.accept();
+			
+			pcMonitor = new PCMonitor(client, errorClient, myRobot, grid, csc);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		myRobot.resetGyro();
+		pcMonitor.start();
+		pcMonitor.sendError(csc.recentError);
+		
+		if (!useColourChart) {
+			myRobot.resetGyro();
+		}
+		
 		// start the pilot monitor
 		PilotMonitor myMonitor = new PilotMonitor(grid);
 		myMonitor.start();
@@ -111,13 +113,12 @@ public class Main {
 				potentialVictims.add(grid.getCell(4, 3));
 				potentialVictims.add(grid.getCell(5, 5));
 		}
-		hungarianMethod = new HungarianMethod(grid, potentialVictims);
-		route = hungarianMethod.findRoute();
 		
 		// set up the behaviours for the arbitrator and construct it
-		Behavior b1 = usePCMonitor ? new MoveBehavior(myRobot, grid, route, pcMonitor, csc) : new MoveBehavior(myRobot, grid, route, csc);
-		Behavior b2 = usePCMonitor ? new ExitBehavior(myRobot, route, myMonitor, pcMonitor) : new ExitBehavior(myRobot, route, myMonitor);
-		Behavior [] behaviorArray = {b1, b2};
+		Behavior b1 = new MoveBehavior(myRobot, grid, path, csc);
+		Behavior b2 = new SelectDestinationBehavior(pcMonitor, potentialVictims, grid, route, path);
+		Behavior b3 = new ExitBehavior(myRobot, myMonitor, pcMonitor, potentialVictims);
+		Behavior [] behaviorArray = {b1, b2, b3};
 		Arbitrator arbitrator = new Arbitrator(behaviorArray);
 		arbitrator.go();
 	}

@@ -1,4 +1,5 @@
 package behaviors;
+
 import java.util.ArrayList;
 
 import lejos.hardware.Button;
@@ -12,21 +13,15 @@ public class ExitBehavior implements Behavior{
 	
 	private boolean suppressed = false;
 	private PilotRobot myRobot;
-	private ArrayList<Cell> route;
 	private PilotMonitor pilotMonitor;
 	private PCMonitor pcMonitor = null;
+	private ArrayList<Cell> potentialVictims;
 	
-	public ExitBehavior(PilotRobot myRobot, ArrayList<Cell> route, PilotMonitor pilotMonitor, PCMonitor pcMonitor) {
+	public ExitBehavior(PilotRobot myRobot, PilotMonitor pilotMonitor, PCMonitor pcMonitor, ArrayList<Cell> potentialVictims) {
 		this.myRobot = myRobot;
-		this.route = route;
 		this.pilotMonitor = pilotMonitor;
 		this.pcMonitor = pcMonitor;
-	}
-	
-	public ExitBehavior(PilotRobot myRobot, ArrayList<Cell> route, PilotMonitor pilotMonitor) {
-		this.myRobot = myRobot;
-		this.route = route;
-		this.pilotMonitor = pilotMonitor;
+		this.potentialVictims = potentialVictims;
 	}
 	
 	public final void suppress() {
@@ -34,14 +29,14 @@ public class ExitBehavior implements Behavior{
 	}
 	
 	public final boolean takeControl() {
-		// TODO take control when all 3 victims have been found and back at hospital
-		return route.isEmpty();
+		return potentialVictims.isEmpty();
 	}
 
 	public final void action() {
 		suppressed = false;
+		
 		myRobot.getBrick().getAudio().systemSound(0);
-		while (Button.ESCAPE.isDown() && !suppressed) {
+		while (Button.ESCAPE.isDown()) {
 			pilotMonitor.terminate();
 			myRobot.closeRobot();
 			if (pcMonitor != null) {

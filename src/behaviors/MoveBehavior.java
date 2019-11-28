@@ -18,10 +18,7 @@ public class MoveBehavior implements Behavior {
 	private MovePilot myPilot;
 	private OdometryPoseProvider opp;
 	private Grid grid;
-	private ArrayList<Cell> route;
-	private PathFinder pathFinder;
-	private ArrayList<Cell> path = new ArrayList<Cell>();
-	private PCMonitor pcMonitor;
+	private ArrayList<Cell> path;
 	private ColourSampleChart csc;
 	private final int maxAngle = 360;
 	
@@ -30,28 +27,14 @@ public class MoveBehavior implements Behavior {
 	private static final int HEADING_EAST = 90;
 	private static final int HEADING_SOUTH = 180;
 	
-	public MoveBehavior(PilotRobot myRobot, Grid grid, ArrayList<Cell> route, PCMonitor pcMonitor, ColourSampleChart csc) {
+	public MoveBehavior(PilotRobot myRobot, Grid grid, ArrayList<Cell> path, ColourSampleChart csc) {
 		this.myRobot = myRobot;
 		myPilot = myRobot.getPilot();
 		opp = myRobot.getOdometryPoseProvider();
 		this.csc = csc;
 		
 		this.grid = grid;
-		this.route = route;
-		pathFinder = new PathFinder(grid.getGrid());
-		
-		this.pcMonitor = pcMonitor;
-	}
-	
-	public MoveBehavior(PilotRobot myRobot, Grid grid, ArrayList<Cell> route, ColourSampleChart csc) {
-		this.myRobot = myRobot;
-		myPilot = myRobot.getPilot();
-		opp = myRobot.getOdometryPoseProvider();
-		this.csc = csc;
-		
-		this.grid = grid;
-		this.route = route;
-		pathFinder = new PathFinder(grid.getGrid());
+		this.path = path;
 	}
 	
 	public final void suppress() {
@@ -64,24 +47,9 @@ public class MoveBehavior implements Behavior {
 
 	public final void action() {
 		suppressed = false;
-		Cell destination = null;
 		
-		// select a destination and build the path
-		if (path.isEmpty()) {
-			// TODO calculate destination
-			destination = route.remove(0);
-			pcMonitor.setPath(path);
-			path = pathFinder.findPath(grid.getCurrentCell(), destination);
-			pcMonitor.setDestination(destination);
-		}
-			
-		if (path != null) {
-			// move to the next step
-			Cell nextStep = path.remove(0);
-			followPath(nextStep.getCoordinates());
-		} else {
-			destination.setIsBlocked();
-		}
+		Cell nextStep = path.remove(0);
+		followPath(nextStep.getCoordinates());
 	}
 	
 	// if the gyroscope has accumilated an angle greater than 360 or less then -360 its returns a reset value.

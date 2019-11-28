@@ -5,7 +5,6 @@ import java.util.ArrayList;
 public class HungarianMethod {
 	private Grid grid;
 	private PathFinder pathFinder;
-	private ArrayList<Cell> path = new ArrayList<Cell>();
 	private ArrayList<Cell> potentialVictims;
 	private ArrayList<Cell> locations;
 	private ArrayList<ArrayList<Integer>> dataMatrix = new ArrayList<ArrayList<Integer>>();
@@ -50,7 +49,8 @@ public class HungarianMethod {
 			for (Cell destination : locations) {
 				if (!location.isBlocked()) {
 					if (location != destination) {
-						path = pathFinder.findPath(location, destination);
+						ArrayList<Cell> path = new ArrayList<Cell>();
+						path = pathFinder.findPath(path, location, destination);
 						
 						// add distance between cells to matrix row
 						if (path != null) {
@@ -227,7 +227,8 @@ public class HungarianMethod {
 		for (int i = 0; i < route.size(); i++) {
 			routeString += route.get(i).toString() + " -> ";
 			if (i != route.size() - 1) {
-				path = pathFinder.findPath(route.get(i), route.get(i + 1));
+				ArrayList<Cell> path = new ArrayList<Cell>();
+				path = pathFinder.findPath(path, route.get(i), route.get(i + 1));
 				for (Cell cell : path) {
 					pathString += cell.toString() + " -> ";
 				}

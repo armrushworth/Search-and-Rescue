@@ -5,6 +5,7 @@ import java.util.Collections;
 
 public class PathFinder {
 	private ArrayList<Cell> grid;
+	private ArrayList<Cell> path;
 	
 	public PathFinder(ArrayList<Cell> grid) {
 		this.grid = grid;
@@ -14,10 +15,10 @@ public class PathFinder {
 		return Math.abs(a.getCoordinates().x - b.getCoordinates().x) + Math.abs(a.getCoordinates().y - b.getCoordinates().y);
 	}
 	
-	public final ArrayList<Cell> findPath(Cell startCell, Cell destinationCell) {
+	public final ArrayList<Cell> findPath(ArrayList<Cell> path, Cell startCell, Cell destinationCell) {
+		this.path = path;
 		ArrayList<Cell> openCells = new ArrayList<Cell>(); // list of currently discovered nodes that are not yet evaluated
 		ArrayList<Cell> closedCells = new ArrayList<Cell>(); // list of nodes already evaluated
-		ArrayList<Cell> path = new ArrayList<Cell>();
 		boolean isPathFound = false;
 		
 		openCells.add(startCell); // add startCell to openCells
