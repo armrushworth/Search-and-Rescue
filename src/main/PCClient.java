@@ -21,14 +21,15 @@ public class PCClient extends JFrame {
 		// set window size
 		myFrame.setResizable(false);
 		myFrame.setSize(1280, 640);
-		robotIcon = new ImageIcon("../images/robot.png");
-		empty = new ImageIcon("../images/empty.png");
+		robotIcon = new ImageIcon(PCClient.class.getResource("/images/robot.png"));
+		empty = new ImageIcon(PCClient.class.getResource("/images/empty.png"));
 		// create master panel
 		JPanel masterPanel = new JPanel();
 		masterPanel.setLayout(new GridLayout(1, 2));
 		
 		// create robot stats panel
 		JPanel robotStats = new JPanel();
+		robotStats.setLayout(new GridLayout(1,2));
 		lRobotStats = new JLabel(); 
 		errorDisplay = new JLabel();
 		
@@ -76,7 +77,7 @@ public class PCClient extends JFrame {
 						+ "<li>Next destination: </li>"
 						+ "<li>Current path: </li>"
 					+ "</ul>");
-		errorDisplay.setText("No errors");
+		errorDisplay.setText("No colour file errors");
 		
 		// ip of the robot
 		String ip = "192.168.70.163"; 

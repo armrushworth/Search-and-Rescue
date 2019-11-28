@@ -23,6 +23,7 @@ public class MoveBehavior implements Behavior {
 	private ArrayList<Cell> path = new ArrayList<Cell>();
 	private PCMonitor pcMonitor;
 	private ColourSampleChart csc;
+	private final int maxAngle = 360;
 	
 	private static final int HEADING_NORTH = 0;
 	private static final int HEADING_WEST = -90;
@@ -86,21 +87,8 @@ public class MoveBehavior implements Behavior {
 	// if the gyroscope has accumilated an angle greater than 360 or less then -360 its returns a reset value.
 	public float correctedGyroReading() {
 		float gyroAngle = myRobot.getAngle();
-		if (gyroAngle > 0) {
-			if (gyroAngle/360 > 1) {
-				gyroAngle -= 360*((int) gyroAngle/360);
-			}
-		} else {
-			if (gyroAngle/360 < -1) {
-				gyroAngle += 360*((int) gyroAngle/360);
-			}
-		}
-		if (gyroAngle > 180) {
-			gyroAngle = gyroAngle - 360;
-		}
-		if (gyroAngle < -180) {
-			gyroAngle = gyroAngle + 360;
-		}
+		while (gyroAngle < 0) gyroAngle += maxAngle;
+		while (gyroAngle > maxAngle) gyroAngle -= maxAngle;
 		return gyroAngle;
 	}
 	
@@ -170,40 +158,47 @@ public class MoveBehavior implements Behavior {
 			
 			opp.setPose(new Pose(opp.getPose().getX(), opp.getPose().getY(), HEADING_SOUTH));
 		}
-		
+		myPilot.setLinearSpeed(1);
 		myPilot.travel(25, true);
 		
 		boolean hasBothCrossedLine = false;
 		while (myPilot.isMoving() ) {
-			if (!hasBothCrossedLine && leftOnLine() && !rightOnLine()) {
+			Boolean leftonline = leftOnLine();
+			Boolean rightonline = rightOnLine();
+			if (!hasBothCrossedLine && leftonline && !rightonline) {
 				myPilot.stop();
-				myRobot.getRightWheel().getMotor().setSpeed(100);
+				myRobot.getRightWheel().getMotor().setSpeed(70);
 				myRobot.getRightWheel().getMotor().forward();
 				while (myRobot.getRightWheel().getMotor().isMoving()) {
 					if (rightOnLine()) {
 						myRobot.getRightWheel().getMotor().stop();
 					}
 				}
-			} else if (!hasBothCrossedLine && rightOnLine() && !leftOnLine()) {
+				hasBothCrossedLine = true;
+			} else if (!hasBothCrossedLine && rightonline && !leftonline) {
 				myPilot.stop();
-				myRobot.getLeftWheel().getMotor().setSpeed(100);
+				myRobot.getLeftWheel().getMotor().setSpeed(70);
 				myRobot.getLeftWheel().getMotor().forward();
 				while (myRobot.getLeftWheel().getMotor().isMoving()) {
 					if (leftOnLine()) {
 						myRobot.getLeftWheel().getMotor().stop();
 					}
 				}
+				hasBothCrossedLine = true;
 			}
 			
-			if (!hasBothCrossedLine && leftOnLine() && rightOnLine()) {
+			if (hasBothCrossedLine || (leftonline && rightonline)) {
 				myPilot.stop();
-				hasBothCrossedLine = true;
 				
 				// continue travel
+				myPilot.setLinearSpeed(10);
 				myPilot.travel(16.5, true);
-				if (myRobot.getDistance() < 5) {
-					myPilot.stop();
+				while (myPilot.isMoving()) {
+					if (myRobot.getDistance() < 5) {
+						myPilot.stop();
+					}
 				}
+
 			}
 		}
 		
@@ -232,10 +227,10 @@ public class MoveBehavior implements Behavior {
 	}
 	
 	public boolean leftOnLine() {
-		return csc.findColor(myRobot.getLeftColor(), true) == "Black";
+		return csc.findColor(myRobot.getLeftColor(), true).equals("Black");
 	}
 	
 	public boolean rightOnLine() {
-		return csc.findColor(myRobot.getRightColor(), false) == "Black";
+		return csc.findColor(myRobot.getRightColor(), false).equals("Black");
 	}
 }

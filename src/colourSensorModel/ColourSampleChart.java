@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 import lejos.hardware.Button;
 import lejos.hardware.lcd.GraphicsLCD;
@@ -71,7 +72,8 @@ public class ColourSampleChart {
    */
   public ColourSampleChart(PilotRobot pr) {
     //Sets k to a multiple of the number of colours that are clustered.
-    k = colours.length*4;
+	  System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
+    k = colours.length*2;
     this.pilotRobot = pr;
     
     //Generates a new colour graph.
@@ -181,21 +183,8 @@ public class ColourSampleChart {
    * @return The detected colour.
    */
   public String findColor(float[] colourSample, Boolean leftSensor) {
-    nearestColours = new int[k];
-    nearestDistances = new double[k];
     
-    //Set the first k labelled colour samples in the graph to be the initial nearest neighbours.
-//    for (int i = 0; i < k; i++) {
-//      if (leftSensor) {
-//        nearestDistances[i] = leftColourSamples.get(i).getVectorDistance(colourSample);
-//        nearestColours[i] = i;
-//      } else {
-//        nearestDistances[i] = rightColourSamples.get(i).getVectorDistance(colourSample);
-//        nearestColours[i] = i;
-//      }
-//
-//    }
-    
+	  //calculate the cartisian distance between the stored labelled colour sample and the new colour sample from the robot.
     for (int i = 0; i < leftColourSamples.size(); i++) {
     	if (leftSensor) {
     	  leftColourSamples.get(i).getVectorDistance(colourSample);
@@ -203,87 +192,54 @@ public class ColourSampleChart {
     	  rightColourSamples.get(i).getVectorDistance(colourSample);
     	}
     }
+    
+    //Sort the list of colour samples by assending order cartisian distance from latest colour sample.
+    //So the samples closest to the newest sample i.e. nearest neighbours will be placed at the start of the list.
     if (leftSensor) {
-    	System.out.println(leftColourSamples.get(0).getColourLabel());
-    	System.out.println(leftColourSamples.get(leftColourSamples.size()-1).getColourLabel());
     	Collections.sort(leftColourSamples);
-    	System.out.println(leftColourSamples.get(0).getColourLabel());
-    	System.out.println(leftColourSamples.get(leftColourSamples.size()-1).getColourLabel());
     } else {
         Collections.sort(rightColourSamples);
     }
 
-//    
-//    /*For every remaining labelled colour sample check if its vector distance is closer than any of the
-//     *  current nearest neighbours.*/
-//    //Both left and right colour sample lists will be the same length.
-//    for (int i = k; i < leftColourSamples.size(); i++) {
-//      double vectorDistance = Double.POSITIVE_INFINITY;
-//      if (leftSensor) {
-//        vectorDistance = leftColourSamples.get(i).getVectorDistance(colourSample);
-//      } else {
-//        vectorDistance = rightColourSamples.get(i).getVectorDistance(colourSample);
-//      }
-//      checkIfShorter(vectorDistance, i);
-//    }
     
-    //Stores the number of times a certain colour is a nearest neighbour. 
-    int[] totalNeighbours = new int[colours.length];
-    //Initialise array values to 0
-    for (int i = 0; i < totalNeighbours.length; i++) {
-      totalNeighbours[i] = 0;
+    //Return the colour with the highest number of nearest neighbours
+    String nn;
+    if (leftSensor) {
+    	nn = mostNearestNeighbours(leftColourSamples);
+    } else {
+    	nn = mostNearestNeighbours(rightColourSamples);
     }
-    
-    /*For every colour check if it occurs as a nearest neighbour.
-     *For every time it does increment its associated totalNeighbours value.*/
-    for (int i = 0; i < k; i++) {
-      for (int j = 0; j < totalNeighbours.length; j++) {
-        if (leftSensor) {
-          //check if colour k is equal to nearest neighbour j.
-          if (leftColourSamples.get(i).getColourLabel().equals(colours[j])) {
-            totalNeighbours[j]++;
-          }
-        } else {
-          if (rightColourSamples.get(i).getColourLabel().equals(colours[j])) {
-            totalNeighbours[j]++;
-          }
-        }
-      }
-    }
-    
-    //Keeps track of which colour has the highest nearest neighbour occurrence.
-    int highestIndex = 0;
-    
-    //For every colour find which colour has the highest occurrence of nearest neighbours
-    for (int i = 0; i < totalNeighbours.length; i++) {
-      if (totalNeighbours[i] > totalNeighbours[highestIndex]) highestIndex = i;
-    }
-    
-    //Return the colour with the highest number of nearest neighbours 
-    return(colours[highestIndex]);
+	return nn;
   }
   
+
   /**
-   * Compare a labelled colour samples vectorDistance with the current list of nearest neighbours.
-   * @param vectorDistance The distance between the new sample and labelled colour samples plotting on the colour chart.
-   * @param index The index of the labelled colour sample being compared.
+   * Take the list of labelled colour samples that are sorted by cartisian distance to the recent sample.
+   * FOR the first k values.
+   * 	When a label first occurs add it to a hashmap with a associated integer value of one, if it already exisits in the hashmap increment this integer.
+   * 	Keep track of the labal that occurs most.
+   * @param lcs a list of LabelledColourSamples
+   * @return labelled colour with the highest occurence.
    */
-//  public void checkIfShorter(double vectorDistance, int index) {
-//    for (int i = 0; i < k; i++) {
-//      if (vectorDistance < nearestDistances[i]) {
-//        
-//        //swap new nearestNeighbour with the current nearest neighbour at index i in the NN list.
-//        double tempDistance = nearestDistances[i];
-//        int tempIndex = nearestColours[i];
-//        nearestDistances[i] = vectorDistance;
-//        nearestColours[i] = index;
-//        
-//        //Check if the swapped out NN is smaller than any other items on the list.
-//        checkIfShorter(tempDistance,tempIndex);
-//        break;
-//      }
-//    }
-//  }
+  public String mostNearestNeighbours(ArrayList<LabelledColourSample> lcs) {
+    HashMap<String,Integer> hm = new HashMap<String,Integer>();
+    int max = 1;
+    String temp = "";
+    for (int i = 0; i < k; i++) {
+    	if (hm.get(lcs.get(i).getColourLabel()) != null) {
+    		int count = hm.get(lcs.get(i).getColourLabel());
+    		count++;
+    		hm.put(lcs.get(i).getColourLabel(), count);
+    		if (count > max) {
+    			max = count;
+    			temp = lcs.get(i).getColourLabel();
+    		}
+    	} else {
+    		hm.put(lcs.get(i).getColourLabel(), 1);
+    	}
+    }
+    return temp;
+  }
   
   /**
    * Every time a new data is collected for a fresh colour graph it gets saved to a text file.

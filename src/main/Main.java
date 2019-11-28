@@ -24,6 +24,7 @@ public class Main {
 	private static ArrayList<Cell> route;
 	
 	public static void main(String[] args) {
+	    System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
 		// Initialise the grid and robot
 		Grid grid = new Grid();
 		PilotRobot myRobot = new PilotRobot();

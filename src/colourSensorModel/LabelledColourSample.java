@@ -92,9 +92,16 @@ public class LabelledColourSample implements Comparable<LabelledColourSample>{
 @Override
 public int compareTo(LabelledColourSample lcs2) {
 	double dif = this.distance - lcs2.getDistance();
-	if (dif > 0.000000001) return 1;
-	if (dif < -0.000000001) return -1;
-	return 0;
+	if (Math.abs(dif) < .000000001) {
+		return 0;
+	} else if (this.distance > lcs2.getDistance()) {
+		return 1;
+	} else if (this.distance < lcs2.getDistance()) {
+		return -1;
+	} else {
+		return 0;
+	}
+
 }
  
 }
