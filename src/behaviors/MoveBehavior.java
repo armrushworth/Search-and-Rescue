@@ -1,22 +1,19 @@
 package behaviors;
-import java.awt.*;
-import java.util.*;
+
+import java.awt.Point;
+import java.util.ArrayList;
 
 import colourSensorModel.ColourSampleChart;
-import lejos.robotics.localization.OdometryPoseProvider;
-import lejos.robotics.navigation.*;
+import lejos.robotics.navigation.MovePilot;
 import lejos.robotics.subsumption.Behavior;
 import main.Cell;
 import main.Grid;
-import main.PathFinder;
 import main.PilotRobot;
-import monitors.PCMonitor;
 
 public class MoveBehavior implements Behavior {
 	private boolean suppressed = false;
 	private PilotRobot myRobot;
 	private MovePilot myPilot;
-	private OdometryPoseProvider opp;
 	private Grid grid;
 	private ArrayList<Cell> path;
 	private ColourSampleChart csc;
@@ -50,20 +47,14 @@ public class MoveBehavior implements Behavior {
 		followPath(nextStep.getCoordinates());
 	}
 	
-	public void rotate(int heading) {
-		float gyroAngle = myRobot.getAngle();
-		myPilot.rotate(getHeadingError(heading));
-		if (getHeadingError(heading) <= -1 || getHeadingError(heading) >= 1) {
-			rotate(heading);
-		}
-	}
+	
 	
 	public void followPath(Point coordinates) {		
-		if (coordinates.x - opp.getPose().getX() > 0) {
+		if (coordinates.x - grid.getCurrentCell().getCoordinates().x > 0) {
 			rotate(HEADING_EAST);
-		} else if (coordinates.x - opp.getPose().getX() < 0) {
+		} else if (coordinates.x - grid.getCurrentCell().getCoordinates().x < 0) {
 			rotate(HEADING_WEST);
-		} else if (coordinates.y - opp.getPose().getY() > 0) {
+		} else if (coordinates.y - grid.getCurrentCell().getCoordinates().y > 0) {
 			rotate(HEADING_NORTH);
 		} else {
 			rotate(HEADING_SOUTH);
@@ -114,10 +105,17 @@ public class MoveBehavior implements Behavior {
 		}
 		
 		// set pose and current cell of grid object
-		opp.setPose(new Pose(coordinates.x, coordinates.y, opp.getPose().getHeading()));
 		grid.setCurrentCell(grid.getCell(coordinates.x, coordinates.y));
 	}
 
+	public void rotate(int heading) {
+		myPilot.rotate(getHeadingError(heading));
+		double remainingHeadingError = getHeadingError(heading);
+		if (remainingHeadingError <= -1 || remainingHeadingError >= 1) {
+			rotate(heading);
+		}
+	}
+	
 	/**
 	 * Calculates the rotation required to be heading in the correct direction for a given destination.
 	 * @param destination the heading of the destination from the current position
