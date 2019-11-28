@@ -18,18 +18,17 @@ public class MoveBehavior implements Behavior {
 	private ArrayList<Cell> path;
 	private ColourSampleChart csc;
 	
-	private static final int HEADING_NORTH = 0;
-	private static final int HEADING_WEST = -90;
-	private static final int HEADING_EAST = 90;
-	private static final int HEADING_SOUTH = 180;
+	private final int HEADING_NORTH = 0;
+	private final int HEADING_WEST = -90;
+	private final int HEADING_EAST = 90;
+	private final int HEADING_SOUTH = 180;
 	
 	public MoveBehavior(PilotRobot myRobot, Grid grid, ArrayList<Cell> path, ColourSampleChart csc) {
 		this.myRobot = myRobot;
 		myPilot = myRobot.getPilot();
-		this.csc = csc;
-		
 		this.grid = grid;
 		this.path = path;
+		this.csc = csc;
 	}
 	
 	public final void suppress() {
@@ -43,22 +42,39 @@ public class MoveBehavior implements Behavior {
 	public final void action() {
 		suppressed = false;
 		
-		Cell nextStep = path.remove(0);
-		followPath(nextStep.getCoordinates());
-	}
-	
-	
-	
-	public void followPath(Point coordinates) {		
+		int heading;
+		int cellCount = 1;
+		Point coordinates = path.get(0).getCoordinates();
 		if (coordinates.x - grid.getCurrentCell().getCoordinates().x > 0) {
-			rotate(HEADING_EAST);
+			while (path.size() > cellCount && path.get(cellCount).getCoordinates().x > coordinates.x && path.get(cellCount).getCoordinates().y == coordinates.y) {
+				cellCount++;
+			}
+			heading = HEADING_EAST;
 		} else if (coordinates.x - grid.getCurrentCell().getCoordinates().x < 0) {
-			rotate(HEADING_WEST);
+			while (path.size() > cellCount && path.get(cellCount).getCoordinates().x < coordinates.x && path.get(cellCount).getCoordinates().y == coordinates.y) {
+				cellCount++;
+			}
+			heading = HEADING_WEST;
 		} else if (coordinates.y - grid.getCurrentCell().getCoordinates().y > 0) {
-			rotate(HEADING_NORTH);
+			while (path.size() > cellCount && path.get(cellCount).getCoordinates().x == coordinates.x && path.get(cellCount).getCoordinates().y > coordinates.y) {
+				cellCount++;
+			}
+			heading = HEADING_NORTH;
 		} else {
-			rotate(HEADING_SOUTH);
+			while (path.size() > cellCount && path.get(cellCount).getCoordinates().x == coordinates.x && path.get(cellCount).getCoordinates().y < coordinates.y) {
+				cellCount++;
+			}
+			heading = HEADING_SOUTH;
 		}
+		rotate(heading);
+		
+		Cell destination = path.remove(0);
+		for (int i = 1; i < cellCount; i++) {
+			destination = path.remove(0);
+		}
+		
+		myPilot.setLinearSpeed(10);
+		myPilot.travel(25 * cellCount - 20);
 		
 		myPilot.setLinearSpeed(1);
 		myPilot.travel(25, true);
@@ -100,12 +116,11 @@ public class MoveBehavior implements Behavior {
 						myPilot.stop();
 					}
 				}
-
 			}
 		}
 		
-		// set pose and current cell of grid object
-		grid.setCurrentCell(grid.getCell(coordinates.x, coordinates.y));
+		// set current cell of grid object
+		grid.setCurrentCell(grid.getCell(destination.getCoordinates().x, destination.getCoordinates().y));
 	}
 
 	public void rotate(int heading) {
