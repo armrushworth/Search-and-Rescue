@@ -79,6 +79,7 @@ public class HungarianMethod {
 	
 	private final void subtractLowestRowValue() {
 		for (int i = 0; i < dataMatrix.size(); i++) {
+			// find the lowest value for each row
 			int min = Integer.MAX_VALUE;
 			for (int j = 0; j < dataMatrix.size(); j++) {
 				int value = dataMatrix.get(i).get(j);
@@ -87,6 +88,7 @@ public class HungarianMethod {
 				}
 			}
 			
+			// subtract the lowest value from each element within the row
 			for (int j = 0; j < dataMatrix.size(); j++) {
 				int value = dataMatrix.get(i).get(j);
 				if (value != -1) {
@@ -98,6 +100,7 @@ public class HungarianMethod {
 	
 	private final void subtractLowestColumnValue() {
 		for (int i = 0; i < dataMatrix.size(); i++) {
+			// find the lowest value for each column
 			int min = Integer.MAX_VALUE;
 			for (int j = 0; j < dataMatrix.size(); j++) {
 				int value = dataMatrix.get(j).get(i);
@@ -106,6 +109,7 @@ public class HungarianMethod {
 				}
 			}
 			
+			// subtract the lowest value from each element within the column
 			for (int j = 0; j < dataMatrix.size(); j++) {
 				int value = dataMatrix.get(j).get(i);
 				if (value != -1) {
@@ -117,10 +121,14 @@ public class HungarianMethod {
 	
 	private final void findHighestPenalty() {
 		int[] highestPenalty = new int[3]; // 0 - location, 1 - destination, 2 - value
+		
+		// find the element equal to 0 with the highest penalty
 		for (int i = 0; i < dataMatrix.size(); i++) {
 			for (int j = 0; j < dataMatrix.size(); j++) {
 				if (dataMatrix.get(i).get(j) == 0) {
 					int lowestHouseValue = findLowestHouseValue(i, j);
+					
+					// check that the destination isn't the starting point and that no cycles are formed using the edge
 					if (lowestHouseValue >= highestPenalty[2] && j != 0 && !isCyclic(i, j)) {
 						highestPenalty[0] = i;
 						highestPenalty[1] = j;
@@ -129,13 +137,50 @@ public class HungarianMethod {
 				}
 			}
 		}
+		graph.get(highestPenalty[0]).add(highestPenalty[1]);
 		
+		// remove elements in the same row and column of the matrix as well as the reverse route
 		dataMatrix.get(highestPenalty[1]).set(highestPenalty[0], -1);
 		for (int i = 0; i < dataMatrix.size(); i++) {
 			dataMatrix.get(highestPenalty[0]).set(i, -1);
 			dataMatrix.get(i).set(highestPenalty[1], -1);
 		}
-		graph.get(highestPenalty[0]).add(highestPenalty[1]);
+	}
+	
+	private final int findLowestHouseValue(int row, int column) {
+		// find the lowest value for the row of the element
+		int lowestRowValue = Integer.MAX_VALUE;
+		for (int i = 0; i < dataMatrix.size(); i++) {
+			if (i != column) {
+				int value = dataMatrix.get(row).get(i);
+				if (value != -1 && value < lowestRowValue) {
+					lowestRowValue = value;
+				}
+			}
+		}
+		
+		// set lowest row value to 0 if there aren't any remaining elements in that row
+		if (lowestRowValue == Integer.MAX_VALUE) {
+			lowestRowValue = 0;
+		}
+		
+		// find the lowest value for the column of the element
+		int lowestColumnValue = Integer.MAX_VALUE;
+		for (int i = 0; i < dataMatrix.size(); i++) {
+			if (i != row) {
+				int value = dataMatrix.get(i).get(column);
+				if (value != -1 && value < lowestColumnValue) {
+					lowestColumnValue = value;
+				}
+			}
+		}
+		
+		// set lowest column value to 0 if there aren't any remaining elements in that column
+		if (lowestColumnValue == Integer.MAX_VALUE) {
+			lowestColumnValue = 0;
+		}
+		
+		return lowestRowValue + lowestColumnValue;
 	}
 	
 	private final boolean isCyclicUtil(int i, boolean[] visited, boolean[] recStack, ArrayList<ArrayList<Integer>> testGraph) { 
@@ -172,37 +217,7 @@ public class HungarianMethod {
 		return false;
 	}
 	
-	private final int findLowestHouseValue(int row, int column) {
-		int lowestRowValue = Integer.MAX_VALUE;
-		for (int i = 0; i < dataMatrix.size(); i++) {
-			if (i != column) {
-				int value = dataMatrix.get(row).get(i);
-				if (value != -1 && value < lowestRowValue) {
-					lowestRowValue = value;
-				}
-			}
-		}
-		if (lowestRowValue == Integer.MAX_VALUE) {
-			lowestRowValue = 0;
-		}
-		
-		int lowestColumnValue = Integer.MAX_VALUE;
-		for (int i = 0; i < dataMatrix.size(); i++) {
-			if (i != row) {
-				int value = dataMatrix.get(i).get(column);
-				if (value != -1 && value < lowestColumnValue) {
-					lowestColumnValue = value;
-				}
-			}
-		}
-		if (lowestColumnValue == Integer.MAX_VALUE) {
-			lowestColumnValue = 0;
-		}
-		
-		return lowestRowValue + lowestColumnValue;
-	}
-	
-	private final void printDataMatrix() {
+	public final void printDataMatrix() {
 		String row = "   ";
 		for (int i = 0; i < dataMatrix.size(); i++) {
 			row += String.format("%1$" + 4 + "s", i == 0 ? grid.getCurrentCell().toString() : potentialVictims.get(i - 1).toString());
@@ -221,7 +236,7 @@ public class HungarianMethod {
 		System.out.println();
 	}
 	
-	private final void printRoute() {
+	public final void printRoute() {
 		String routeString = "Route: ";
 		String pathString = "\nFull Path: " + route.get(0) + " -> ";
 		for (int i = 0; i < route.size(); i++) {
