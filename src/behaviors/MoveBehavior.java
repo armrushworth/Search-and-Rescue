@@ -20,7 +20,6 @@ public class MoveBehavior implements Behavior {
 	private Grid grid;
 	private ArrayList<Cell> path;
 	private ColourSampleChart csc;
-	private final int maxAngle = 360;
 	
 	private static final int HEADING_NORTH = 0;
 	private static final int HEADING_WEST = -90;
@@ -30,7 +29,6 @@ public class MoveBehavior implements Behavior {
 	public MoveBehavior(PilotRobot myRobot, Grid grid, ArrayList<Cell> path, ColourSampleChart csc) {
 		this.myRobot = myRobot;
 		myPilot = myRobot.getPilot();
-		opp = myRobot.getOdometryPoseProvider();
 		this.csc = csc;
 		
 		this.grid = grid;
@@ -52,80 +50,25 @@ public class MoveBehavior implements Behavior {
 		followPath(nextStep.getCoordinates());
 	}
 	
-	// if the gyroscope has accumilated an angle greater than 360 or less then -360 its returns a reset value.
-	public float correctedGyroReading() {
+	public void rotate(int heading) {
 		float gyroAngle = myRobot.getAngle();
-		while (gyroAngle < 0) gyroAngle += maxAngle;
-		while (gyroAngle > maxAngle) gyroAngle -= maxAngle;
-		return gyroAngle;
+		myPilot.rotate(getHeadingError(heading));
+		if (getHeadingError(heading) <= -1 || getHeadingError(heading) >= 1) {
+			rotate(heading);
+		}
 	}
 	
-	/**
-	 * Moves towards the coordinates of a neighbouring cell.
-	 * @param x the x-coordinate of the cell to travel towards
-	 * @param y the y-coordinate of the cell to travel towards
-	 */
-	public void followPath(Point coordinates) {
-		float gyroAngle;
-		OdometryPoseProvider opp = myRobot.getOdometryPoseProvider();
-		//reset gyroScope since it accumilates degrees in direction of rotation.
+	public void followPath(Point coordinates) {		
 		if (coordinates.x - opp.getPose().getX() > 0) {
-			myPilot.rotate(getHeadingError(HEADING_EAST));
-			gyroAngle = correctedGyroReading();
-			
-			//correct for error
-			if (!(gyroAngle > 89 && gyroAngle < 91)){
-				if (gyroAngle > 0) {
-					myPilot.rotate(90-gyroAngle);
-				} else {
-					myPilot.rotate(-270-gyroAngle);
-				}
-			}
-			
-			opp.setPose(new Pose(opp.getPose().getX(), opp.getPose().getY(), HEADING_EAST));
+			rotate(HEADING_EAST);
 		} else if (coordinates.x - opp.getPose().getX() < 0) {
-			myPilot.rotate(getHeadingError(HEADING_WEST));
-			gyroAngle = correctedGyroReading();
-			
-			//correct for error
-			if (!(gyroAngle < -89 && gyroAngle > -91)){
-				if (gyroAngle > 0) {
-					myPilot.rotate(270-gyroAngle);
-				} else {
-					myPilot.rotate(-90-gyroAngle);
-				}
-			}
-			
-			opp.setPose(new Pose(opp.getPose().getX(), opp.getPose().getY(), HEADING_WEST));
+			rotate(HEADING_WEST);
 		} else if (coordinates.y - opp.getPose().getY() > 0) {
-			myPilot.rotate(getHeadingError(HEADING_NORTH));
-			gyroAngle = correctedGyroReading();
-			
-			//correct for error
-			if (!(gyroAngle < 1 && gyroAngle > -1 )){
-				if (gyroAngle > 0) {
-					myPilot.rotate(0-gyroAngle);
-				} else {
-					myPilot.rotate(-360-gyroAngle);
-				}
-			}
-			
-			opp.setPose(new Pose(opp.getPose().getX(), opp.getPose().getY(), HEADING_NORTH));
+			rotate(HEADING_NORTH);
 		} else {
-			myPilot.rotate(getHeadingError(HEADING_SOUTH));
-			gyroAngle = correctedGyroReading();
-			
-			//correct for error
-			if (!(gyroAngle > 179 ||gyroAngle < -179 )){
-				if (gyroAngle > 0) {
-					myPilot.rotate(180-gyroAngle);
-				} else {
-					myPilot.rotate(-180-gyroAngle);
-				}
-			}
-			
-			opp.setPose(new Pose(opp.getPose().getX(), opp.getPose().getY(), HEADING_SOUTH));
+			rotate(HEADING_SOUTH);
 		}
+		
 		myPilot.setLinearSpeed(1);
 		myPilot.travel(25, true);
 		
@@ -181,7 +124,7 @@ public class MoveBehavior implements Behavior {
 	 * @return the amount of rotation required
 	 */
 	public double getHeadingError(int destination) {
-		double initial = opp.getPose().getHeading();
+		double initial = myRobot.getAngle();
 		double diff = destination - initial;
 		double absDiff = Math.abs(diff);
 

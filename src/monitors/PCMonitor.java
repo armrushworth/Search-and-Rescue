@@ -66,7 +66,7 @@ public class PCMonitor extends Thread {
 				out.println("Stationary");
 			}
 			out.println(robot.getPilot().getMovement().getMoveType());
-			out.println(robot.getOdometryPoseProvider().getPose().getHeading());
+			out.println(robot.getAngle());
 			// output the destination
 			if (destination != null) {
 				out.println("(" + destination.getCoordinates().x + ", " + destination.getCoordinates().y + ")");

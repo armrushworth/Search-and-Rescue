@@ -16,7 +16,6 @@ public class PilotRobot {
 	private SampleProvider ultrasonicSampleProvider, gyroSampleProvider, leftColorSampleProvider, rightColorSampleProvider;
 	private float[] ultrasonicSample, gyroSample, leftColorSample, rightColorSample;
 	private MovePilot pilot;
-	private OdometryPoseProvider opp;
 	private Wheel leftWheel = WheeledChassis.modelWheel(Motor.B, 4.05).offset(-4.9);
 	private Wheel rightWheel = WheeledChassis.modelWheel(Motor.D, 4.05).offset(4.9);
 	
@@ -27,7 +26,6 @@ public class PilotRobot {
 		setupGyroSensor();
 		setupUltrasonicSensor();
 		setupPilot();
-		setupOdometryPoseProvider();
 	}
 	
 	// set up the color sensors
@@ -62,12 +60,6 @@ public class PilotRobot {
 		pilot.setAngularSpeed(45);
 	}
 	
-	// set up the odometry pose provider
-	private void setupOdometryPoseProvider() {
-		opp = new OdometryPoseProvider(pilot);
-		opp.setPose(new Pose(0, 0, 0));
-	}
-	
 	// close the bumpers, ultrasonic sensor & gyro sensor
 	public final void closeRobot() {
 		ultrasonicSensor.close();
@@ -77,7 +69,10 @@ public class PilotRobot {
 	// get the robots current angle
 	public final float getAngle() {
 		gyroSampleProvider.fetchSample(gyroSample, 0);
-		return gyroSample[0];
+		float gyroAngle = gyroSample[0];
+		while (gyroAngle < 0) gyroAngle += 360;
+		while (gyroAngle > 360) gyroAngle -= 360;
+		return gyroAngle;
 	}
 	
 	// get the brick
@@ -100,11 +95,6 @@ public class PilotRobot {
 	// get the left wheel
 	public Wheel getLeftWheel() {
 		return leftWheel;
-	}
-	
-	// get the odometry pose provider
-	public final OdometryPoseProvider getOdometryPoseProvider() {
-		return opp;
 	}
 	
 	// get the pilot object from the robot
