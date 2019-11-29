@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 import colourSensorModel.ColourSampleChart;
+import lejos.robotics.RegulatedMotor;
 import lejos.robotics.navigation.MovePilot;
 import lejos.robotics.subsumption.Behavior;
 import main.Cell;
@@ -76,46 +77,51 @@ public class MoveBehavior implements Behavior {
 		myPilot.setLinearSpeed(10);
 		myPilot.travel(25 * cellCount - 20);
 		
-		myPilot.setLinearSpeed(1);
-		myPilot.travel(25, true);
-		
 		boolean hasBothCrossedLine = false;
-		while (myPilot.isMoving() ) {
-			Boolean leftonline = leftOnLine();
-			Boolean rightonline = rightOnLine();
-			if (!hasBothCrossedLine && leftonline && !rightonline) {
-				myPilot.stop();
-				myRobot.getRightWheel().getMotor().setSpeed(70);
-				myRobot.getRightWheel().getMotor().forward();
-				while (myRobot.getRightWheel().getMotor().isMoving()) {
-					if (rightOnLine()) {
-						myRobot.getRightWheel().getMotor().stop();
-					}
-				}
-				hasBothCrossedLine = true;
-			} else if (!hasBothCrossedLine && rightonline && !leftonline) {
-				myPilot.stop();
-				myRobot.getLeftWheel().getMotor().setSpeed(70);
-				myRobot.getLeftWheel().getMotor().forward();
-				while (myRobot.getLeftWheel().getMotor().isMoving()) {
-					if (leftOnLine()) {
-						myRobot.getLeftWheel().getMotor().stop();
-					}
-				}
-				hasBothCrossedLine = true;
-			}
+		while (!hasBothCrossedLine) {
+			myPilot.setLinearSpeed(1);
+			myPilot.travel(8.5, true);
 			
-			if (hasBothCrossedLine || (leftonline && rightonline)) {
-				myPilot.stop();
-				
-				// continue travel
-				myPilot.setLinearSpeed(10);
-				myPilot.travel(16.5, true);
-				while (myPilot.isMoving()) {
-					if (myRobot.getDistance() < 5) {
+			while (myPilot.isMoving() ) {
+				Boolean leftonline = leftOnLine();
+				Boolean rightonline = rightOnLine();
+				RegulatedMotor wheel = null;
+				if (!hasBothCrossedLine) {
+					if (leftonline && !rightonline) {
+						wheel = myRobot.getRightWheel().getMotor();
+					} else if (rightonline && !leftonline) {
+						wheel = myRobot.getLeftWheel().getMotor();
+					}
+					if (wheel != null) {
 						myPilot.stop();
+						wheel.setSpeed(50);
+						wheel.forward();
+						while (wheel.isMoving()) {
+							if (leftOnLine()) {
+								wheel.stop();
+							}
+						}
+						hasBothCrossedLine = true;
 					}
 				}
+				
+				if (hasBothCrossedLine || (leftonline && rightonline)) {
+					myPilot.stop();
+					hasBothCrossedLine = true;
+					
+					// continue travel
+					myPilot.setLinearSpeed(10);
+					myPilot.travel(16.5, true);
+					while (myPilot.isMoving()) {
+						if (myRobot.getDistance() < 5) {
+							myPilot.stop();
+						}
+					}
+				}
+			}
+			if (!hasBothCrossedLine) {
+				myPilot.setLinearSpeed(10);
+				myPilot.travel(-18.5);
 			}
 		}
 		
