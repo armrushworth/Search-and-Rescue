@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import lejos.hardware.Button;
 import lejos.robotics.subsumption.Behavior;
 import main.Cell;
+import main.Grid;
 import main.PilotRobot;
 import monitors.PCMonitor;
 import monitors.PilotMonitor;
@@ -16,12 +17,13 @@ public class ExitBehavior implements Behavior{
 	private PilotMonitor pilotMonitor;
 	private PCMonitor pcMonitor = null;
 	private ArrayList<Cell> potentialVictims;
+	private Grid grid;
 	
-	public ExitBehavior(PilotRobot myRobot, PilotMonitor pilotMonitor, PCMonitor pcMonitor, ArrayList<Cell> potentialVictims) {
+	public ExitBehavior(PilotRobot myRobot, PilotMonitor pilotMonitor, PCMonitor pcMonitor, Grid grid) {
 		this.myRobot = myRobot;
 		this.pilotMonitor = pilotMonitor;
 		this.pcMonitor = pcMonitor;
-		this.potentialVictims = potentialVictims;
+		this.grid = grid;
 	}
 	
 	public final void suppress() {
@@ -29,7 +31,8 @@ public class ExitBehavior implements Behavior{
 	}
 	
 	public final boolean takeControl() {
-		return potentialVictims.isEmpty();
+		potentialVictims = grid.getPotentialVictims();
+		return potentialVictims.isEmpty() && grid.getCurrentCell() == grid.getCell(0, 0);
 	}
 
 	public final void action() {

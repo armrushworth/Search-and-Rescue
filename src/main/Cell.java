@@ -7,6 +7,7 @@ public class Cell {
 	private Point coordinates;
 	private boolean isBlocked = false;
 	private ArrayList<Cell> neighbours = new ArrayList<Cell>();
+	private int status = 0; // 0: no victim, 1: potential victim, 2: non-urgent victim, 3: urgent victim
 	
 	private int f = 0; // cost estimate
 	private int g = 0; // cost of the path from the start node to the destination
@@ -41,6 +42,10 @@ public class Cell {
 		return previousCell;
 	}
 	
+	public final int getStatus() {
+		return status;
+	}
+	
 	public final boolean isBlocked() {
 		return isBlocked;
 	}
@@ -67,6 +72,10 @@ public class Cell {
 	
 	public final void setPreviousCell(Cell previousCell) {
 		this.previousCell = previousCell;
+	}
+	
+	public final void setStatus(int status) {
+		this.status = status;
 	}
 	
 	public final String toString() {

@@ -14,16 +14,14 @@ public class SelectDestinationBehavior implements Behavior {
 	private HungarianMethod hungarianMethod;
 	private PathFinder pathFinder;
 	private PCMonitor pcMonitor;
-	private ArrayList<Cell> potentialVictims;
 	private Grid grid;
 	private ArrayList<Cell> route;
 	private ArrayList<Cell> path;
 	private Cell destination;
 	
-	public SelectDestinationBehavior(PCMonitor pcMonitor, ArrayList<Cell> potentialVictims, Grid grid, ArrayList<Cell> route, ArrayList<Cell> path) {
+	public SelectDestinationBehavior(PCMonitor pcMonitor, Grid grid, ArrayList<Cell> route, ArrayList<Cell> path) {
 		pathFinder = new PathFinder(grid.getGrid());
 		this.pcMonitor = pcMonitor;
-		this.potentialVictims = potentialVictims;
 		this.grid = grid;
 		this.route = route;
 		this.path = path;
@@ -39,13 +37,14 @@ public class SelectDestinationBehavior implements Behavior {
 
 	public final void action() {
 		suppressed = false;
+		ArrayList<Cell> potentialVictims = grid.getPotentialVictims();
 		
-		if (destination != null && grid.getCurrentCell() == destination) {
-			potentialVictims.remove(destination);
-		}
 		if (route.isEmpty() && !potentialVictims.isEmpty()) {
 			hungarianMethod = new HungarianMethod(grid, potentialVictims);
 			route = hungarianMethod.findRoute();
+		}
+		if (potentialVictims.isEmpty()) {
+			pathFinder.findPath(path, grid.getCurrentCell(), grid.getCell(0, 0));
 		}
 		if (path.isEmpty()) {
 			destination = route.remove(0);

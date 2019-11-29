@@ -58,6 +58,16 @@ public class Grid {
 		return GRID_WIDTH;
 	}
 	
+	public final ArrayList<Cell> getPotentialVictims() {
+		ArrayList<Cell> potentialVictims = new ArrayList<Cell>();
+		for (Cell cell : grid) {
+			if (cell.getStatus() == 1) {
+				potentialVictims.add(cell);
+			}
+		}
+		return potentialVictims;
+	}
+	
 	public final void setCurrentCell(Cell currentCell) {
 		this.currentCell = currentCell;
 	}

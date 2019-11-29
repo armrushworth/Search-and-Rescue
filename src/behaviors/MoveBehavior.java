@@ -74,8 +74,8 @@ public class MoveBehavior implements Behavior {
 			destination = path.remove(0);
 		}
 		
-		myPilot.setLinearSpeed(10);
-		myPilot.travel(25 * cellCount - 20);
+		myPilot.setLinearSpeed(5);
+		myPilot.travel(25 * cellCount - 21.5);
 		
 		boolean hasBothCrossedLine = false;
 		while (!hasBothCrossedLine) {
@@ -110,7 +110,7 @@ public class MoveBehavior implements Behavior {
 					hasBothCrossedLine = true;
 					
 					// continue travel
-					myPilot.setLinearSpeed(10);
+					myPilot.setLinearSpeed(5);
 					myPilot.travel(16.5, true);
 					while (myPilot.isMoving()) {
 						if (myRobot.getDistance() < 5) {
@@ -120,7 +120,7 @@ public class MoveBehavior implements Behavior {
 				}
 			}
 			if (!hasBothCrossedLine) {
-				myPilot.setLinearSpeed(10);
+				myPilot.setLinearSpeed(5);
 				myPilot.travel(-18.5);
 			}
 		}
