@@ -1,0 +1,38 @@
+/*
+
+    assignment2
+
+    ---------------------------
+
+
+
+    Jason Project File
+
+
+
+    This file defines the initial state of the MAS
+
+
+
+    Jason 
+
+    December 02, 2019 - 14:11:23
+
+*/
+
+
+
+MAS assignment2 {
+	infrastructure: Centralised
+
+	environment: ParamedicEnv
+
+	agents:
+		paramedic;
+		doctor;
+
+	aslSourcePath:
+		"src/asl";
+}
+
+

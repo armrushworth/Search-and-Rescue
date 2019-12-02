@@ -1,9 +1,12 @@
 package main;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import behaviors.ExitBehavior;
@@ -64,6 +67,36 @@ public class Main {
 		// start the pilot monitor
 		PilotMonitor myMonitor = new PilotMonitor(grid);
 		myMonitor.start();
+		
+		try {
+			System.out.println("Awaiting server 3..");
+			Socket agentServer = new Socket("138.253.35.65", 1235);
+			BufferedReader in = new BufferedReader(new InputStreamReader(agentServer.getInputStream()));
+			System.out.println("connecting");
+		    Cell[] victims = new Cell[5];
+		    Cell[] obstacles = new Cell[4];
+		    Cell hospital;
+		    String coords;
+			for (int i = 0; i < victims.length; i++) {
+				coords = in.readLine();
+				victims[i] = new Cell(Integer.parseInt(coords.split(",")[0]),Integer.parseInt(coords.split(",")[1]));
+			}
+			for (int i = 0; i < obstacles.length; i++) {
+				coords = in.readLine();
+				obstacles[i] = new Cell(Integer.parseInt(coords.split(",")[0]),Integer.parseInt(coords.split(",")[1]));
+			}
+			coords = in.readLine();
+			hospital = new Cell(Integer.parseInt(coords.split(",")[0]),Integer.parseInt(coords.split(",")[1]));
+			System.out.println("Hospital location = " + hospital.getCoordinates().x + " , " + hospital.getCoordinates().y);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			pcMonitor.sendError(e);
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			pcMonitor.sendError(e);
+			e.printStackTrace();
+		}
 		
 		// TODO replace with AgentSpeak logic
 		int bayNumber = 4;
