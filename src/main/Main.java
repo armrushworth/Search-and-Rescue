@@ -8,7 +8,6 @@ import java.util.ArrayList;
 
 import behaviors.ExitBehavior;
 import behaviors.MoveBehavior;
-import behaviors.ScanVictimBehavior;
 import behaviors.SelectDestinationBehavior;
 import colourSensorModel.ColourSampleChart;
 import lejos.robotics.subsumption.Arbitrator;
@@ -67,7 +66,7 @@ public class Main {
 		myMonitor.start();
 		
 		// TODO replace with AgentSpeak logic
-		int bayNumber = 2;
+		int bayNumber = 4;
 		switch (bayNumber) {
 			case 1:
 				grid.getCell(1, 1).setIsBlocked();
@@ -116,10 +115,9 @@ public class Main {
 		
 		// set up the behaviours for the arbitrator and construct it
 		Behavior b1 = new MoveBehavior(myRobot, grid, path, csc);
-		Behavior b2 = new SelectDestinationBehavior(pcMonitor, grid, route, path);
-		Behavior b3 = new ScanVictimBehavior(myRobot, csc, grid);
-		Behavior b4 = new ExitBehavior(myRobot, myMonitor, pcMonitor, grid);
-		Behavior [] behaviorArray = {b1, b2, b3, b4};
+		Behavior b2 = new SelectDestinationBehavior(myRobot, pcMonitor, csc, grid, route, path);
+		Behavior b3 = new ExitBehavior(myRobot, myMonitor, pcMonitor, grid);
+		Behavior [] behaviorArray = {b1, b2, b3};
 		Arbitrator arbitrator = new Arbitrator(behaviorArray);
 		arbitrator.go();
 	}

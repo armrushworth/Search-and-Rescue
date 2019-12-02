@@ -2,26 +2,36 @@ package behaviors;
 
 import java.util.ArrayList;
 
+import colourSensorModel.ColourSampleChart;
 import lejos.robotics.subsumption.Behavior;
 import main.Cell;
 import main.Grid;
 import main.HungarianMethod;
 import main.PathFinder;
+import main.PilotRobot;
 import monitors.PCMonitor;
 
 public class SelectDestinationBehavior implements Behavior {
 	private boolean suppressed = false;
 	private HungarianMethod hungarianMethod;
 	private PathFinder pathFinder;
+	private PilotRobot myRobot;
 	private PCMonitor pcMonitor;
+	private ColourSampleChart csc;
 	private Grid grid;
+	private ArrayList<Cell> potentialVictims;
+	private ArrayList<Cell> nonUrgentVictims;
 	private ArrayList<Cell> route;
 	private ArrayList<Cell> path;
 	private Cell destination;
+	private String leftColor;
+	private String rightColor;
 	
-	public SelectDestinationBehavior(PCMonitor pcMonitor, Grid grid, ArrayList<Cell> route, ArrayList<Cell> path) {
+	public SelectDestinationBehavior(PilotRobot myRobot, PCMonitor pcMonitor, ColourSampleChart csc, Grid grid, ArrayList<Cell> route, ArrayList<Cell> path) {
 		pathFinder = new PathFinder(grid.getGrid());
+		this.myRobot = myRobot;
 		this.pcMonitor = pcMonitor;
+		this.csc = csc;
 		this.grid = grid;
 		this.route = route;
 		this.path = path;
@@ -37,15 +47,53 @@ public class SelectDestinationBehavior implements Behavior {
 
 	public final void action() {
 		suppressed = false;
-		ArrayList<Cell> potentialVictims = grid.getPotentialVictims();
+		potentialVictims = grid.getPotentialVictims();
+		nonUrgentVictims = grid.getNonUrgentVictims();
 		
+		leftColor = csc.findColor(myRobot.getLeftColor(), true);
+		rightColor = csc.findColor(myRobot.getRightColor(), false);
+		
+		// reached non-urgent victim after all urgent victims have been reached
+		if (nonUrgentVictims.contains(grid.getCurrentCell())) {
+			grid.getCurrentCell().setStatus(0);
+			route.clear();
+			pathFinder.findPath(path, grid.getCurrentCell(), grid.getCell(0, 0));
+		}
+		
+		// reached a potential victim
+		if (potentialVictims.contains(grid.getCurrentCell())) {
+			if ((leftColor.equals("White") || leftColor.equals("Yellow")) && (rightColor.equals("White") || rightColor.equals("Yellow"))) {
+				// no victim
+				grid.getCurrentCell().setStatus(0);
+			} else if (leftColor.equals("Cyan") && rightColor.equals("Cyan")) {
+				// non-urgent victim
+				grid.getCurrentCell().setStatus(2);
+			} else if (leftColor.equals("Burgundy") && rightColor.equals("Burgundy")) {
+				// urgent victim
+				grid.getCurrentCell().setStatus(0);
+				route.clear();
+				pathFinder.findPath(path, grid.getCurrentCell(), grid.getCell(0, 0));
+			}
+		}
+		
+		// dropped urgent victims off at this hospital
 		if (route.isEmpty() && !potentialVictims.isEmpty()) {
 			hungarianMethod = new HungarianMethod(grid, potentialVictims);
 			route = hungarianMethod.findRoute();
 		}
-		if (potentialVictims.isEmpty()) {
+		
+		// no more victims to pick up
+		if (potentialVictims.isEmpty() && nonUrgentVictims.isEmpty()) {
 			pathFinder.findPath(path, grid.getCurrentCell(), grid.getCell(0, 0));
 		}
+		
+		// pick up non-urgent victim
+		if (potentialVictims.isEmpty() && !nonUrgentVictims.isEmpty()) {
+			hungarianMethod = new HungarianMethod(grid, nonUrgentVictims);
+			route = hungarianMethod.findRoute();
+		}
+		
+		// go to next route location
 		if (path.isEmpty()) {
 			destination = route.remove(0);
 			pathFinder.findPath(path, grid.getCurrentCell(), destination);

@@ -69,13 +69,35 @@ public class MoveBehavior implements Behavior {
 		}
 		rotate(heading);
 		
-		Cell destination = path.remove(0);
-		for (int i = 1; i < cellCount; i++) {
+		Cell destination = path.get(0);
+		myPilot.setLinearAcceleration(5);
+		myPilot.setAngularAcceleration(15);
+		myPilot.setLinearSpeed(5);
+		for (int i = 0; i < cellCount; i++) {
 			destination = path.remove(0);
+			
+			if (i == cellCount - 1) {
+				myPilot.travel(3.5);
+			} else {
+				myPilot.travel(25);
+				coordinates = path.get(0).getCoordinates();
+				if (coordinates.x - grid.getCurrentCell().getCoordinates().x > 0) {
+					heading = HEADING_EAST;
+				} else if (coordinates.x - grid.getCurrentCell().getCoordinates().x < 0) {
+					heading = HEADING_WEST;
+				} else if (coordinates.y - grid.getCurrentCell().getCoordinates().y > 0) {
+					heading = HEADING_NORTH;
+				} else {
+					heading = HEADING_SOUTH;
+				}
+				rotate(heading);
+			}
+			
+			
+			
 		}
 		
-		myPilot.setLinearSpeed(5);
-		myPilot.travel(25 * cellCount - 21.5);
+		
 		
 		boolean hasBothCrossedLine = false;
 		while (!hasBothCrossedLine) {

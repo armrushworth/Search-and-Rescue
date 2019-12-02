@@ -17,6 +17,7 @@ public class ExitBehavior implements Behavior{
 	private PilotMonitor pilotMonitor;
 	private PCMonitor pcMonitor = null;
 	private ArrayList<Cell> potentialVictims;
+	private ArrayList<Cell> nonUrgentVictims;
 	private Grid grid;
 	
 	public ExitBehavior(PilotRobot myRobot, PilotMonitor pilotMonitor, PCMonitor pcMonitor, Grid grid) {
@@ -32,7 +33,8 @@ public class ExitBehavior implements Behavior{
 	
 	public final boolean takeControl() {
 		potentialVictims = grid.getPotentialVictims();
-		return potentialVictims.isEmpty() && grid.getCurrentCell() == grid.getCell(0, 0);
+		nonUrgentVictims = grid.getNonUrgentVictims();
+		return potentialVictims.isEmpty() && nonUrgentVictims.isEmpty() && grid.getCurrentCell() == grid.getCell(0, 0);
 	}
 
 	public final void action() {

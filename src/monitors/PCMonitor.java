@@ -25,6 +25,9 @@ public class PCMonitor extends Thread {
 	//The actual robot.
 	private PilotRobot robot;
 
+	private ArrayList<Cell> potentialVictims = new ArrayList<Cell>();
+	private ArrayList<Cell> nonUrgentVictims = new ArrayList<Cell>();
+	
 	private Grid grid;
 	
 	private ColourSampleChart csc;
@@ -67,6 +70,30 @@ public class PCMonitor extends Thread {
 			}
 			out.println(robot.getPilot().getMovement().getMoveType());
 			out.println(robot.getAngle());
+			
+			// output victim information
+			potentialVictims = grid.getPotentialVictims();
+			if (!potentialVictims.isEmpty()) {
+				String potentialVictimsOutput = "";
+				for (Cell cell : potentialVictims) {
+					potentialVictimsOutput += "(" + cell.getCoordinates().x + ", " + cell.getCoordinates().y + "), ";
+				}
+				out.println(potentialVictimsOutput);
+			} else {
+				out.println("null");
+			}
+			
+			nonUrgentVictims = grid.getNonUrgentVictims();
+			if (!nonUrgentVictims.isEmpty()) {
+				String nonUrgentVictimsOutput = "";
+				for (Cell cell : nonUrgentVictims) {
+					nonUrgentVictimsOutput += "(" + cell.getCoordinates().x + ", " + cell.getCoordinates().y + "), ";
+				}
+				out.println(nonUrgentVictimsOutput);
+			} else {
+				out.println("null");
+			}
+			
 			// output the destination
 			if (destination != null) {
 				out.println("(" + destination.getCoordinates().x + ", " + destination.getCoordinates().y + ")");

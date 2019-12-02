@@ -58,6 +58,16 @@ public class Grid {
 		return GRID_WIDTH;
 	}
 	
+	public final ArrayList<Cell> getNonUrgentVictims() {
+		ArrayList<Cell> nonUrgentVictims = new ArrayList<Cell>();
+		for (Cell cell : grid) {
+			if (cell.getStatus() == 2) {
+				nonUrgentVictims.add(cell);
+			}
+		}
+		return nonUrgentVictims;
+	}
+	
 	public final ArrayList<Cell> getPotentialVictims() {
 		ArrayList<Cell> potentialVictims = new ArrayList<Cell>();
 		for (Cell cell : grid) {
