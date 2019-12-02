@@ -32,6 +32,7 @@ public class PCMonitor extends Thread {
 	
 	private ColourSampleChart csc;
 	
+	private ArrayList<Cell> route = new ArrayList<Cell>();
 	private Cell destination = null;
 	private ArrayList<Cell> path = new ArrayList<Cell>();
 
@@ -78,7 +79,7 @@ public class PCMonitor extends Thread {
 				for (Cell cell : potentialVictims) {
 					potentialVictimsOutput += "(" + cell.getCoordinates().x + ", " + cell.getCoordinates().y + "), ";
 				}
-				out.println(potentialVictimsOutput);
+				out.println(potentialVictimsOutput.substring(0, potentialVictimsOutput.length() - 2));
 			} else {
 				out.println("null");
 			}
@@ -89,21 +90,28 @@ public class PCMonitor extends Thread {
 				for (Cell cell : nonUrgentVictims) {
 					nonUrgentVictimsOutput += "(" + cell.getCoordinates().x + ", " + cell.getCoordinates().y + "), ";
 				}
-				out.println(nonUrgentVictimsOutput);
+				out.println(nonUrgentVictimsOutput.substring(0, nonUrgentVictimsOutput.length() - 2));
+			} else {
+				out.println("null");
+			}
+			
+			// output the route
+			if (!route.isEmpty()) {
+				String routeOutput = destination != null ? "(" + destination.getCoordinates().x + ", " + destination.getCoordinates().y + "), " : "";
+				for (Cell cell : route) {
+					routeOutput += "(" + cell.getCoordinates().x + ", " + cell.getCoordinates().y + "), ";
+				}
+				out.println(routeOutput.substring(0, routeOutput.length() - 2));
 			} else {
 				out.println("null");
 			}
 			
 			// output the destination
-			if (destination != null) {
-				out.println("(" + destination.getCoordinates().x + ", " + destination.getCoordinates().y + ")");
-			} else {
-				out.println("null");
-			}
+			out.println(destination != null ? "(" + destination.getCoordinates().x + ", " + destination.getCoordinates().y + ")" : "null");
 			
 			// output the path
-			if (path != null && !path.isEmpty()) {
-				String pathOutput = "";
+			if (!path.isEmpty()) {
+				String pathOutput = (destination != null) ? "(" + destination.getCoordinates().x + ", " + destination.getCoordinates().y + "), " : "";
 				for (Cell cell : path) {
 					pathOutput += "(" + cell.getCoordinates().x + ", " + cell.getCoordinates().y + "), ";
 				}
@@ -136,6 +144,10 @@ public class PCMonitor extends Thread {
 	
 	public final void setPath (ArrayList<Cell> path) {
 		this.path = path;
+	}
+	
+	public final void setRoute (ArrayList<Cell> route) {
+		this.route = route;
 	}
 	
 	public final void terminate() {

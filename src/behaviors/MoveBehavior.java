@@ -69,10 +69,10 @@ public class MoveBehavior implements Behavior {
 		}
 		rotate(heading);
 		
-		Cell destination = path.get(0);
 		myPilot.setLinearAcceleration(5);
-		myPilot.setAngularAcceleration(15);
 		myPilot.setLinearSpeed(5);
+		
+		Cell destination = path.get(0);
 		for (int i = 0; i < cellCount; i++) {
 			destination = path.remove(0);
 			
@@ -92,12 +92,7 @@ public class MoveBehavior implements Behavior {
 				}
 				rotate(heading);
 			}
-			
-			
-			
 		}
-		
-		
 		
 		boolean hasBothCrossedLine = false;
 		while (!hasBothCrossedLine) {
@@ -130,6 +125,10 @@ public class MoveBehavior implements Behavior {
 				if (hasBothCrossedLine || (leftonline && rightonline)) {
 					myPilot.stop();
 					hasBothCrossedLine = true;
+					
+					if (myRobot.getAngle() >= -45 && myRobot.getAngle() <= 45) {
+						myRobot.resetGyro();
+					}
 					
 					// continue travel
 					myPilot.setLinearSpeed(5);

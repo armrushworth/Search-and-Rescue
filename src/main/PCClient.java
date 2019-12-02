@@ -74,6 +74,7 @@ public class PCClient extends JFrame {
 						+ "<li>Type: </li>"
 						+ "<li>Heading: </li>"
 					+ "</ul>Navigation strategy:<ul>"
+						+ "<li>Route: </li>"
 						+ "<li>Next destination: </li>"
 						+ "<li>Current path: </li>"
 					+ "</ul>");
@@ -122,6 +123,7 @@ public class PCClient extends JFrame {
 							+ "<li>Potential victims: " + in.readLine() + "</li>"
 							+ "<li>Non-urgent victims: " + in.readLine() + "</li>"
 						+ "</ul>Navigation strategy:<ul>"
+							+ "<li>Route: " + in.readLine() + "</li>"
 							+ "<li>Next destination: " + in.readLine() + "</li>"
 							+ "<li>Current path: " + in.readLine() + "</li>"
 						+ "</ul>");
