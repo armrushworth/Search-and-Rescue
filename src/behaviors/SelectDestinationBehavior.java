@@ -91,15 +91,17 @@ public class SelectDestinationBehavior implements Behavior {
 		if (potentialVictims.isEmpty() && !nonUrgentVictims.isEmpty()) {
 			hungarianMethod = new HungarianMethod(grid, nonUrgentVictims);
 			route = hungarianMethod.findRoute();
+			pcMonitor.setRoute(route);
 		}
 		
 		// go to next route location
 		if (path.isEmpty()) {
 			destination = route.remove(0);
 			pathFinder.findPath(path, grid.getCurrentCell(), destination);
-
-			pcMonitor.setPath(path);
-			pcMonitor.setDestination(destination);
 		}
+		
+		pcMonitor.setRoute(route);
+		pcMonitor.setPath(path);
+		pcMonitor.setDestination(destination);
 	}
 }
