@@ -1,23 +1,26 @@
-package main;
 import java.awt.*;
 import java.io.*;
 import java.net.*;
 import javax.swing.*;
 
-public class PCClient extends JFrame {
+public class PCClient extends Thread {
 	// bufferd reader this will connect to the socket PCMonitor.java uses
-	private static BufferedReader in;
-	private static BufferedReader errorIn;
+	private BufferedReader in;
+	private BufferedReader errorIn;
+	
+	//checks if thread is running.
+	private  volatile boolean running = true;
 	
 	// display robot data
-	private static JFrame myFrame = new JFrame("Robot progress"); 
-	private static JLabel lRobotStats; 
-	private static JLabel errorDisplay;
-	private static JLabel[] robotStates = new JLabel[36];
-	private static ImageIcon robotIcon;
-	private static ImageIcon empty;
+	private JFrame myFrame = new JFrame("Robot progress"); 
+	private JLabel lRobotStats; 
+	private JLabel errorDisplay;
+	private JLabel[] robotStates = new JLabel[36];
+	private ImageIcon robotIcon;
+	private ImageIcon empty;
 	
-	public static void main(String[] args) throws IOException {
+	@Override
+	public void run() {
 		// set window size
 		myFrame.setResizable(false);
 		myFrame.setSize(1280, 640);
@@ -82,23 +85,25 @@ public class PCClient extends JFrame {
 		
 		// ip of the robot
 		String ip = "192.168.70.163"; 
-		
-		if (args.length > 0) {
-			ip = args[0];
+		try {
+			// create a new socket connection with the robots PCMonitor.java.
+			Socket socket = new Socket(ip, 1234);
+			System.out.println("Connected1");
+			Socket errorSocket = new Socket(ip, 1111);
+			System.out.println("Connected2");
+			
+			// get Input from PCMonitor.
+			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			errorIn = new BufferedReader(new InputStreamReader(errorSocket.getInputStream()));
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
-		// create a new socket connection with the robots PCMonitor.java.
-		Socket socket = new Socket(ip, 1234);
-		System.out.println("Connected1");
-		Socket errorSocket = new Socket(ip, 1111);
-		System.out.println("Connected2");
-		
-		// get Input from PCMonitor.
-		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		errorIn = new BufferedReader(new InputStreamReader(errorSocket.getInputStream()));
-		
 		// constantly update values.
-		while (true) {
+		while (running) {
 			updateValues();
 		}
 	}
@@ -106,7 +111,7 @@ public class PCClient extends JFrame {
 	/**
 	 * Displays data about the robot as an HTML list in a java swing window.
 	 */
-	public static void updateValues() {
+	public void updateValues() {
 		try {
 			lRobotStats.setText(
 					"<html><h1>Robot 14</h1>\n"

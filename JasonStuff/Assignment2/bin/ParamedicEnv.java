@@ -4,7 +4,9 @@ import jason.asSyntax.*;
 import jason.environment.*;
 import jason.environment.grid.GridWorldModel;
 import jason.environment.grid.GridWorldView;
-import main.Cell;
+
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
@@ -14,18 +16,23 @@ import java.net.UnknownHostException;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.io.PrintWriter;
 import java.util.logging.*;
 
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
 public class ParamedicEnv extends Environment {
-	
-    public static final int GSize = 6; // The bay is a 6x6 grid
-    public static final int HOSPITAL  = 8; // hospital code in grid model
-    public static final int VICTIM  = 16; // victim code in grid model
     public String[] victims = new String[5];
     public String[] obstacles = new String[4];
     public String hospital;
     public boolean dataSent = false;
+    public Socket socket;
+    PCClient pc = new PCClient();
     
     // Create objects for visualising the bay.  
     // This is based on the Cleaning Robots code.
@@ -35,6 +42,18 @@ public class ParamedicEnv extends Environment {
     @Override
     public void init(String[] args) {
         super.init(args);
+        pc.start();
+        try {
+			String ip = "192.168.70.163"; 
+			System.out.println("Awaiting server Brick..");
+			socket = new Socket(ip, 1235);
+			if (socket.isConnected()) {
+				System.out.println("Connected");
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         //addPercept(ASSyntax.parseLiteral("percept(demo)"));
     }
 
@@ -88,21 +107,10 @@ public class ParamedicEnv extends Environment {
         super.stop();
     }
     
-    public void sendMapData() {
-		try {
-			String ip = "192.168.70.163"; 
-			System.out.println("Awaiting server Brick..");
-			Socket socket = new Socket(ip, 1235);
-			if (socket.isConnected()) {
-				System.out.println("Connected");
-			}
-			
-			out = new PrintWriter(socket.getOutputStream(), true);
-			System.out.println("Writer established");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    public void sendMapData() {	
+		out = new PrintWriter(socket.getOutputStream(), true);
+		System.out.println("Writer established");
+
 		for (int i = 0; i < victims.length; i++) {
 			System.out.println("flag");
 			out.println(victims[i]);
@@ -111,9 +119,15 @@ public class ParamedicEnv extends Environment {
 			out.println(obstacles[i]);
 		}
 		out.println(hospital);
-		
+		listenForResponse();
+    }
+    
+    public void listenForResponse() {
+    	BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+    	
     }
     
 
     // ======================================================================
 }
+
