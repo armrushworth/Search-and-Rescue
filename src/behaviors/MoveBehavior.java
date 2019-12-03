@@ -55,13 +55,14 @@ public class MoveBehavior implements Behavior {
 			heading = HEADING_SOUTH;
 		}
 		rotate(heading);
+		myRobot.setHeading(heading);
 		
 		Cell destination = path.remove(0);
 		
 		myRobot.setColorIDMode();
 		myPilot.setLinearSpeed(5);
 		
-		if (grid.getCurrentCell().getStatus() != 3) {
+		if (grid.getCurrentCell().getStatus() != 4) {
 			myPilot.travel(25, true);
 			boolean hasBothCrossedLine = false;
 			while (myPilot.isMoving() ) {
@@ -89,9 +90,7 @@ public class MoveBehavior implements Behavior {
 					myPilot.stop();
 					hasBothCrossedLine = true;
 					
-					if (myRobot.getAngle() >= -45 && myRobot.getAngle() <= 45) {
-						myRobot.resetGyro();
-					}
+					myRobot.resetGyro();
 					
 					// continue travel
 					myPilot.travel(16.5, true);
@@ -122,7 +121,7 @@ public class MoveBehavior implements Behavior {
 	 * @return the amount of rotation required
 	 */
 	public double getHeadingError(int destination) {
-		double initial = myRobot.getAngle();
+		double initial = myRobot.getAngle() + myRobot.getHeading();
 		double diff = destination - initial;
 		double absDiff = Math.abs(diff);
 

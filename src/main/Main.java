@@ -13,6 +13,7 @@ import behaviors.ExitBehavior;
 import behaviors.MoveBehavior;
 import behaviors.SelectDestinationBehavior;
 import colourSensorModel.ColourSampleChart;
+import lejos.hardware.Sound;
 import lejos.robotics.subsumption.Arbitrator;
 import lejos.robotics.subsumption.Behavior;
 import monitors.PCMonitor;
@@ -24,6 +25,7 @@ public class Main {
 	private static boolean useColourChart = true;
 	private static ArrayList<Cell> route = new ArrayList<Cell>();
 	private static ArrayList<Cell> path = new ArrayList<Cell>();
+	private static ArrayList<Cell> potentialVictims = new ArrayList<Cell>();
 	
 	public static void main(String[] args) {
 	    System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
@@ -53,7 +55,7 @@ public class Main {
 			ServerSocket errorServer = new ServerSocket(1111);
 			Socket errorClient = errorServer.accept();
 			
-			pcMonitor = new PCMonitor(client, errorClient, myRobot, grid, csc);
+			pcMonitor = new PCMonitor(client, errorClient, myRobot, grid, potentialVictims, csc);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -86,6 +88,7 @@ public class Main {
 				int y = Integer.parseInt(coords.split(",")[1]);
 				System.out.println("victim:"+ coords);
 				grid.getCell(x, y).setStatus(1);
+				potentialVictims.add(grid.getCell(x, y));
 			}
 			for (int i = 0; i < obstacles.length; i++) {
 				coords = in.readLine();
@@ -153,6 +156,8 @@ public class Main {
 //				grid.getCell(4, 3).setStatus(1);
 //				grid.getCell(5, 5).setStatus(1);
 //		}
+		
+		Sound.beepSequenceUp();
 		
 		// set up the behaviours for the arbitrator and construct it
 		Behavior b1 = new MoveBehavior(myRobot, grid, path, csc);

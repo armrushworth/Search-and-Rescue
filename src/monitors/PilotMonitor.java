@@ -21,7 +21,7 @@ public class PilotMonitor extends Thread {
 			updateMap();
 
 			try {
-				sleep(500);
+				sleep(400);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				running = false;
@@ -29,17 +29,10 @@ public class PilotMonitor extends Thread {
 		}
 	}
 
-	/**
-	 * Draws the 6 by 7 Occupancy grid used to map the environment.
-	 */
+	// draw the occupancy grid used to map the environment
 	private void updateMap() {
-		//this is the only way i could stop the lcd screen overlaping text might revisit
-//		for (int i = 0; i < 9; i++) {
-//			System.out.println("");
-//			System.out.flush();
-//		}
 		int rowCounter = 1;
-		lcd.drawString("+---+---+---+---+---+---+---+", 0, 0, 0);
+		lcd.drawString("+---+---+---+---+---+---+", 0, 0, 0);
 
 		for (int y = grid.getGridHeight() - 1; y >= 0; y--) {
 			String rowString = "|";
@@ -52,6 +45,14 @@ public class PilotMonitor extends Thread {
 				} else if (grid.getCell(x, y).isBlocked()) {
 					rowString += "|||";
 				
+				// display if the cell is a potential victim
+				} else if (grid.getCell(x, y).getStatus() == 1) {
+					rowString += " ? ";
+					
+				// display if the cell is a potential victim
+				} else if (grid.getCell(x, y).getStatus() == 2) {
+					rowString += " P ";
+					
 				// display if the cell is empty
 				} else {
 					rowString += "   ";
@@ -60,7 +61,7 @@ public class PilotMonitor extends Thread {
 			}
 			
 			lcd.drawString(rowString, 0, (rowCounter) * 10, 0);
-			lcd.drawString("+---+---+---+---+---+---+---+", 0, (rowCounter + 1) *10, 0);
+			lcd.drawString("+---+---+---+---+---+---+", 0, (rowCounter + 1) *10, 0);
 			rowCounter += 2;
 		}
 	}

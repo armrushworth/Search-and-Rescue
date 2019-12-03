@@ -3,6 +3,7 @@ package behaviors;
 import java.util.ArrayList;
 
 import colourSensorModel.ColourSampleChart;
+import lejos.hardware.Sound;
 import lejos.robotics.subsumption.Behavior;
 import main.Cell;
 import main.Grid;
@@ -57,13 +58,16 @@ public class SelectDestinationBehavior implements Behavior {
 			rightColor = csc.findColor(myRobot.getRightColor(), false);
 			if ((leftColor.equals("White") || leftColor.equals("Yellow")) && (rightColor.equals("White") || rightColor.equals("Yellow"))) {
 				// no victim
+				Sound.buzz();
 				grid.getCurrentCell().setStatus(0);
 			} else if (leftColor.equals("Cyan") && rightColor.equals("Cyan")) {
 				// non-urgent victim
+				Sound.beep();
 				grid.getCurrentCell().setStatus(2);
 			} else if (leftColor.equals("Burgundy") && rightColor.equals("Burgundy")) {
 				// urgent victim
-				grid.getCurrentCell().setStatus(3);
+				Sound.twoBeeps();
+				grid.getCurrentCell().setStatus(4);
 				route.clear();
 				pathFinder.findPath(path, grid.getCurrentCell(), grid.getCell(0, 0));
 				destination = grid.getCell(0, 0);
@@ -81,7 +85,7 @@ public class SelectDestinationBehavior implements Behavior {
 				} else {
 					// pick up non-urgent victim
 					if (nonUrgentVictims.contains(grid.getCurrentCell())) {
-						grid.getCurrentCell().setStatus(0);
+						grid.getCurrentCell().setStatus(3);
 						route.clear();
 						
 					// travel to non-urgent victim

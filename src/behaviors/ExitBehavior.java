@@ -3,6 +3,7 @@ package behaviors;
 import java.util.ArrayList;
 
 import lejos.hardware.Button;
+import lejos.hardware.Sound;
 import lejos.robotics.subsumption.Behavior;
 import main.Cell;
 import main.Grid;
@@ -40,14 +41,14 @@ public class ExitBehavior implements Behavior{
 	public final void action() {
 		suppressed = false;
 		
-		myRobot.getBrick().getAudio().systemSound(0);
-		while (!Button.ESCAPE.isDown()) {
-			pilotMonitor.terminate();
-			myRobot.closeRobot();
-			if (pcMonitor != null) {
-				pcMonitor.terminate();
-			}
-			System.exit(0);
+		Sound.beepSequence();
+		Button.waitForAnyPress();
+		
+		pilotMonitor.terminate();
+		myRobot.closeRobot();
+		if (pcMonitor != null) {
+			pcMonitor.terminate();
 		}
+		System.exit(0);
 	}
 }

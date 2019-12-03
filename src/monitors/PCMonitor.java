@@ -25,8 +25,7 @@ public class PCMonitor extends Thread {
 	//The actual robot.
 	private PilotRobot robot;
 
-	private ArrayList<Cell> potentialVictims = new ArrayList<Cell>();
-	private ArrayList<Cell> nonUrgentVictims = new ArrayList<Cell>();
+	private ArrayList<Cell> potentialVictims;
 	
 	private Grid grid;
 	
@@ -36,11 +35,12 @@ public class PCMonitor extends Thread {
 	private Cell destination = null;
 	private ArrayList<Cell> path = new ArrayList<Cell>();
 
-	public PCMonitor(Socket client, Socket errorSocket, PilotRobot robot, Grid grid, ColourSampleChart csc) {
+	public PCMonitor(Socket client, Socket errorSocket, PilotRobot robot, Grid grid, ArrayList<Cell> potentialVictims, ColourSampleChart csc) {
 		this.client = client;
 		this.errorSocket = errorSocket;
 		this.robot = robot;
 		this.grid = grid;
+		this.potentialVictims = potentialVictims;
 		this.csc = csc;
 		
 		try {
@@ -56,41 +56,43 @@ public class PCMonitor extends Thread {
 	//run the thread
 	public void run() {
 		while (running) {
-			
-			// output sensor information
-			out.println(robot.getDistance());
-			out.println(robot.getAngle());
-			out.println(csc.findColor(robot.getLeftColor(),true));
-			out.println(csc.findColor(robot.getRightColor(),false));
-			
-			// ouptut movement information
-			if (robot.getPilot().isMoving()) {
-				out.println("Moving");
-			} else {
-				out.println("Stationary");
-			}
-			out.println(robot.getPilot().getMovement().getMoveType());
-			out.println(robot.getAngle());
-			
 			// output victim information
-			potentialVictims = grid.getPotentialVictims();
-			if (!potentialVictims.isEmpty()) {
-				String potentialVictimsOutput = "";
-				for (Cell cell : potentialVictims) {
-					potentialVictimsOutput += "(" + cell.getCoordinates().x + ", " + cell.getCoordinates().y + "), ";
+			for (int i = 0; i < 4; i++) {
+				if (!potentialVictims.isEmpty()) {
+					String potentialVictimsOutput = "";
+					potentialVictimsOutput += "(" + potentialVictims.get(i).getCoordinates().x + ", " + potentialVictims.get(i).getCoordinates().y + ") ";
+					switch (potentialVictims.get(i).getStatus()) {
+						case 1:
+							potentialVictimsOutput += "Unknown";
+							break;
+						case 2:
+							potentialVictimsOutput += "Non-urgent victim";
+							break;
+						case 3:
+							potentialVictimsOutput += "Non-urgent victim (collected)";
+							break;
+						case 4:
+							potentialVictimsOutput += "Urgent victim (collected)";
+							break;
+						default:
+							potentialVictimsOutput += "Empty";
+					}
+					out.println(potentialVictimsOutput);
+				} else {
+					out.println("null");
 				}
-				out.println(potentialVictimsOutput.substring(0, potentialVictimsOutput.length() - 2));
-			} else {
-				out.println("null");
 			}
 			
-			nonUrgentVictims = grid.getNonUrgentVictims();
-			if (!nonUrgentVictims.isEmpty()) {
-				String nonUrgentVictimsOutput = "";
-				for (Cell cell : nonUrgentVictims) {
-					nonUrgentVictimsOutput += "(" + cell.getCoordinates().x + ", " + cell.getCoordinates().y + "), ";
+			// output the destination
+			out.println(destination != null ? "(" + destination.getCoordinates().x + ", " + destination.getCoordinates().y + ")" : "null");
+			
+			// output the path
+			if (!path.isEmpty()) {
+				String pathOutput = (destination != null) ? "(" + destination.getCoordinates().x + ", " + destination.getCoordinates().y + "), " : "";
+				for (Cell cell : path) {
+					pathOutput += "(" + cell.getCoordinates().x + ", " + cell.getCoordinates().y + "), ";
 				}
-				out.println(nonUrgentVictimsOutput.substring(0, nonUrgentVictimsOutput.length() - 2));
+				out.println(pathOutput.substring(0, pathOutput.length() - 2));
 			} else {
 				out.println("null");
 			}
@@ -106,18 +108,33 @@ public class PCMonitor extends Thread {
 				out.println("null");
 			}
 			
-			// output the destination
-			out.println(destination != null ? "(" + destination.getCoordinates().x + ", " + destination.getCoordinates().y + ")" : "null");
+			// output sensor information
+			out.println(robot.getDistance());
+			out.println(robot.getAngle());
+			out.println(csc.findColor(robot.getLeftColor(),true));
+			out.println(csc.findColor(robot.getRightColor(),false));
 			
-			// output the path
-			if (!path.isEmpty()) {
-				String pathOutput = (destination != null) ? "(" + destination.getCoordinates().x + ", " + destination.getCoordinates().y + "), " : "";
-				for (Cell cell : path) {
-					pathOutput += "(" + cell.getCoordinates().x + ", " + cell.getCoordinates().y + "), ";
-				}
-				out.println(pathOutput.substring(0, pathOutput.length() - 2));
+			// output movement information
+			if (robot.getPilot().isMoving()) {
+				out.println("Moving");
 			} else {
-				out.println("null");
+				out.println("Stationary");
+			}
+			out.println(robot.getPilot().getMovement().getMoveType());
+			
+			// output the heading
+			switch (robot.getHeading()) {
+				case 0:
+					out.println("North");
+					break;
+				case 90:
+					out.println("East");
+					break;
+				case -90:
+					out.println("West");
+					break;
+				default:
+					out.println("South");
 			}
 			
 			out.println(grid.getCurrentCell().getCoordinates().x + "," + grid.getCurrentCell().getCoordinates().y);

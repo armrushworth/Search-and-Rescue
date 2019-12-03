@@ -18,6 +18,7 @@ public class PilotRobot {
 	private MovePilot pilot;
 	private Wheel leftWheel = WheeledChassis.modelWheel(Motor.B, 4.05).offset(-4.9);
 	private Wheel rightWheel = WheeledChassis.modelWheel(Motor.D, 4.05).offset(4.9);
+	private int heading = 0;
 	
 	// PilotRobot constructor=
 	public PilotRobot() {
@@ -106,6 +107,11 @@ public class PilotRobot {
 		return leftWheel;
 	}
 	
+	// get the heading
+	public int getHeading() {
+		return heading;
+	}
+	
 	// get the pilot object from the robot
 	public final MovePilot getPilot() {
 		return this.pilot;
@@ -130,5 +136,10 @@ public class PilotRobot {
 	// reset the gyro sensor
 	public final void resetGyro() {
 		gyroSensor.reset();
+	}
+	
+	// set the heading
+	public final void setHeading(int heading) {
+		this.heading = heading;
 	}
 }

@@ -9,10 +9,9 @@ public class PCClient extends Thread {
 	private BufferedReader errorIn;
 	
 	//checks if thread is running.
-	private  volatile boolean running = true;
+	private volatile boolean running = true;
 	
 	// display robot data
-	private JFrame myFrame = new JFrame("Robot progress"); 
 	private JLabel lRobotStats; 
 	private JLabel errorDisplay;
 	private JLabel[] robotStates = new JLabel[36];
@@ -23,11 +22,12 @@ public class PCClient extends Thread {
 	public void run() {
 		// set window size
 		myFrame.setResizable(false);
-		myFrame.setSize(1280, 640);
+		myFrame.setSize(1240, 640);
 		robotIcon = new ImageIcon(PCClient.class.getResource("/images/robot.png"));
 		empty = new ImageIcon(PCClient.class.getResource("/images/empty.png"));
 		// create master panel
 		JPanel masterPanel = new JPanel();
+		masterPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 		masterPanel.setLayout(new GridLayout(1, 2));
 		
 		// create robot stats panel
@@ -66,8 +66,18 @@ public class PCClient extends Thread {
 		myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		myFrame.setVisible(true); 
 		lRobotStats.setText(
-				"<html><h1>Robot 14</h1>\n"
-					+ "Sensor data:<ul>"
+				"<html><div  style=\"padding: 20px\"><h1>Robot 14</h1>\n\n"
+					+ "Victim information:<ol>"
+						+ "<li>( , )</li>"
+						+ "<li>( , )</li>"
+						+ "<li>( , )</li>"
+						+ "<li>( , )</li>"
+						+ "<li>( , )</li>"
+					+ "</ol>Navigation strategy:<ul>"
+						+ "<li>Destination: </li>"
+						+ "<li>Path: </li>"
+						+ "<li>Route: </li>"
+					+ "</ul>Sensor data:<ul>"
 						+ "<li>Sonar distance: </li>"
 						+ "<li>Gyro angle: </li>"
 						+ "<li>Left colour: </li>"
@@ -75,12 +85,7 @@ public class PCClient extends Thread {
 					+ "</ul>Movement information:<ul>"
 						+ "<li>Status: </li>"
 						+ "<li>Type: </li>"
-						+ "<li>Heading: </li>"
-					+ "</ul>Navigation strategy:<ul>"
-						+ "<li>Route: </li>"
-						+ "<li>Next destination: </li>"
-						+ "<li>Current path: </li>"
-					+ "</ul>");
+						+ "<li>Heading: </li></ul>");
 		errorDisplay.setText("No colour file errors");
 		
 		// ip of the robot
@@ -114,8 +119,19 @@ public class PCClient extends Thread {
 	public void updateValues() {
 		try {
 			lRobotStats.setText(
-					"<html><h1>Robot 14</h1>\n"
-						+ "Sensor data:<ul>"
+					"<html><div  style=\"padding: 20px\"><h1>Robot 14</h1>\n"
+						+ in.readLine() + "\n"
+						+ "Victim information:<ol>"
+							+ "<li>" + in.readLine() + "</li>"
+							+ "<li>" + in.readLine() + "</li>"
+							+ "<li>" + in.readLine() + "</li>"
+							+ "<li>" + in.readLine() + "</li>"
+							+ "<li>" + in.readLine() + "</li>"
+						+ "</ol>Navigation strategy:<ul>"
+							+ "<li>Destination: " + in.readLine() + "</li>"
+							+ "<li>Path: " + in.readLine() + "</li>"
+							+ "<li>Route: " + in.readLine() + "</li>"
+						+ "</ul>Sensor data:<ul>"
 							+ "<li>Sonar distance: " + in.readLine() + "</li>"
 							+ "<li>Gyro angle: " + in.readLine() + "</li>"
 							+ "<li>Left colour: " + in.readLine() + "</li>"
@@ -123,15 +139,7 @@ public class PCClient extends Thread {
 						+ "</ul>Movement information:<ul>"
 							+ "<li>Status: " + in.readLine() + "</li>"
 							+ "<li>Type: " + in.readLine() + "</li>"
-							+ "<li>Heading: " + in.readLine() + "</li>"
-						+ "</ul>Victim information:<ul>"
-							+ "<li>Potential victims: " + in.readLine() + "</li>"
-							+ "<li>Non-urgent victims: " + in.readLine() + "</li>"
-						+ "</ul>Navigation strategy:<ul>"
-							+ "<li>Route: " + in.readLine() + "</li>"
-							+ "<li>Next destination: " + in.readLine() + "</li>"
-							+ "<li>Current path: " + in.readLine() + "</li>"
-						+ "</ul>");
+							+ "<li>Heading: " + in.readLine() + "</li></ul>");
 			// update display grid with robot position
 			String currentCell = in.readLine();
 			int x = Integer.parseInt(currentCell.split(",")[0]);
