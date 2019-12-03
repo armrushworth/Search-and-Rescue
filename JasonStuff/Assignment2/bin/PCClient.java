@@ -12,6 +12,7 @@ public class PCClient extends Thread {
 	private volatile boolean running = true;
 	
 	// display robot data
+	private JFrame myFrame = new JFrame("Robot progress");
 	private JLabel lRobotStats; 
 	private JLabel errorDisplay;
 	private JLabel[] robotStates = new JLabel[36];
