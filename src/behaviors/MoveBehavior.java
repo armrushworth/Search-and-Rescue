@@ -44,85 +44,48 @@ public class MoveBehavior implements Behavior {
 		suppressed = false;
 		
 		int heading;
-		int cellCount = 1;
 		Point coordinates = path.get(0).getCoordinates();
 		if (coordinates.x - grid.getCurrentCell().getCoordinates().x > 0) {
-			while (path.size() > cellCount && path.get(cellCount).getCoordinates().x > coordinates.x && path.get(cellCount).getCoordinates().y == coordinates.y) {
-				cellCount++;
-			}
 			heading = HEADING_EAST;
 		} else if (coordinates.x - grid.getCurrentCell().getCoordinates().x < 0) {
-			while (path.size() > cellCount && path.get(cellCount).getCoordinates().x < coordinates.x && path.get(cellCount).getCoordinates().y == coordinates.y) {
-				cellCount++;
-			}
 			heading = HEADING_WEST;
 		} else if (coordinates.y - grid.getCurrentCell().getCoordinates().y > 0) {
-			while (path.size() > cellCount && path.get(cellCount).getCoordinates().x == coordinates.x && path.get(cellCount).getCoordinates().y > coordinates.y) {
-				cellCount++;
-			}
 			heading = HEADING_NORTH;
 		} else {
-			while (path.size() > cellCount && path.get(cellCount).getCoordinates().x == coordinates.x && path.get(cellCount).getCoordinates().y < coordinates.y) {
-				cellCount++;
-			}
 			heading = HEADING_SOUTH;
 		}
 		rotate(heading);
 		
-		myPilot.setLinearAcceleration(5);
+		Cell destination = path.remove(0);
+		
+		myRobot.setColorIDMode();
 		myPilot.setLinearSpeed(5);
 		
-		Cell destination = path.get(0);
-		for (int i = 0; i < cellCount; i++) {
-			destination = path.remove(0);
-			
-			if (i == cellCount - 1) {
-				myPilot.travel(3.5);
-			} else {
-				myPilot.travel(25);
-				coordinates = path.get(0).getCoordinates();
-				if (coordinates.x - grid.getCurrentCell().getCoordinates().x > 0) {
-					heading = HEADING_EAST;
-				} else if (coordinates.x - grid.getCurrentCell().getCoordinates().x < 0) {
-					heading = HEADING_WEST;
-				} else if (coordinates.y - grid.getCurrentCell().getCoordinates().y > 0) {
-					heading = HEADING_NORTH;
-				} else {
-					heading = HEADING_SOUTH;
-				}
-				rotate(heading);
-			}
-		}
-		
-		boolean hasBothCrossedLine = false;
-		while (!hasBothCrossedLine) {
-			myPilot.setLinearSpeed(1);
-			myPilot.travel(8.5, true);
-			
+		if (grid.getCurrentCell().getStatus() != 3) {
+			myPilot.travel(25, true);
+			boolean hasBothCrossedLine = false;
 			while (myPilot.isMoving() ) {
-				Boolean leftonline = leftOnLine();
-				Boolean rightonline = rightOnLine();
-				RegulatedMotor wheel = null;
-				if (!hasBothCrossedLine) {
-					if (leftonline && !rightonline) {
-						wheel = myRobot.getRightWheel().getMotor();
-					} else if (rightonline && !leftonline) {
-						wheel = myRobot.getLeftWheel().getMotor();
-					}
-					if (wheel != null) {
-						myPilot.stop();
-						wheel.setSpeed(50);
-						wheel.forward();
-						while (wheel.isMoving()) {
-							if (leftOnLine()) {
-								wheel.stop();
-							}
+				if (!hasBothCrossedLine && leftOnLine() && !rightOnLine()) {
+					myPilot.stop();
+					myRobot.getRightWheel().getMotor().setSpeed(100);
+					myRobot.getRightWheel().getMotor().forward();
+					while (myRobot.getRightWheel().getMotor().isMoving()) {
+						if (rightOnLine()) {
+							myRobot.getRightWheel().getMotor().stop();
 						}
-						hasBothCrossedLine = true;
+					}
+				} else if (!hasBothCrossedLine && rightOnLine() && !leftOnLine()) {
+					myPilot.stop();
+					myRobot.getLeftWheel().getMotor().setSpeed(100);
+					myRobot.getLeftWheel().getMotor().forward();
+					while (myRobot.getLeftWheel().getMotor().isMoving()) {
+						if (leftOnLine()) {
+							myRobot.getLeftWheel().getMotor().stop();
+						}
 					}
 				}
 				
-				if (hasBothCrossedLine || (leftonline && rightonline)) {
+				if (!hasBothCrossedLine && leftOnLine() && rightOnLine()) {
 					myPilot.stop();
 					hasBothCrossedLine = true;
 					
@@ -131,19 +94,14 @@ public class MoveBehavior implements Behavior {
 					}
 					
 					// continue travel
-					myPilot.setLinearSpeed(5);
 					myPilot.travel(16.5, true);
-					while (myPilot.isMoving()) {
-						if (myRobot.getDistance() < 5) {
-							myPilot.stop();
-						}
+					if (myRobot.getDistance() < 5) {
+						myPilot.stop();
 					}
 				}
 			}
-			if (!hasBothCrossedLine) {
-				myPilot.setLinearSpeed(5);
-				myPilot.travel(-18.5);
-			}
+		} else {
+			myPilot.travel(25);
 		}
 		
 		// set current cell of grid object
@@ -178,10 +136,10 @@ public class MoveBehavior implements Behavior {
 	}
 	
 	public boolean leftOnLine() {
-		return csc.findColor(myRobot.getLeftColor(), true).equals("Black");
+		return myRobot.getLeftColor()[0] == 7;
 	}
 	
 	public boolean rightOnLine() {
-		return csc.findColor(myRobot.getRightColor(), false).equals("Black");
+		return myRobot.getRightColor()[0] == 7;
 	}
 }

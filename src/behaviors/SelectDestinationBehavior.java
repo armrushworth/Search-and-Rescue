@@ -50,18 +50,11 @@ public class SelectDestinationBehavior implements Behavior {
 		potentialVictims = grid.getPotentialVictims();
 		nonUrgentVictims = grid.getNonUrgentVictims();
 		
-		leftColor = csc.findColor(myRobot.getLeftColor(), true);
-		rightColor = csc.findColor(myRobot.getRightColor(), false);
-		
-		// reached non-urgent victim after all urgent victims have been reached
-		if (nonUrgentVictims.contains(grid.getCurrentCell())) {
-			grid.getCurrentCell().setStatus(0);
-			route.clear();
-			pathFinder.findPath(path, grid.getCurrentCell(), grid.getCell(0, 0));
-		}
-		
 		// reached a potential victim
 		if (potentialVictims.contains(grid.getCurrentCell())) {
+			myRobot.setRGBMode();
+			leftColor = csc.findColor(myRobot.getLeftColor(), true);
+			rightColor = csc.findColor(myRobot.getRightColor(), false);
 			if ((leftColor.equals("White") || leftColor.equals("Yellow")) && (rightColor.equals("White") || rightColor.equals("Yellow"))) {
 				// no victim
 				grid.getCurrentCell().setStatus(0);
@@ -70,33 +63,41 @@ public class SelectDestinationBehavior implements Behavior {
 				grid.getCurrentCell().setStatus(2);
 			} else if (leftColor.equals("Burgundy") && rightColor.equals("Burgundy")) {
 				// urgent victim
-				grid.getCurrentCell().setStatus(0);
+				grid.getCurrentCell().setStatus(3);
 				route.clear();
 				pathFinder.findPath(path, grid.getCurrentCell(), grid.getCell(0, 0));
+				destination = grid.getCell(0, 0);
 			}
 		}
 		
-		// dropped urgent victims off at this hospital
-		if (route.isEmpty() && !potentialVictims.isEmpty()) {
-			hungarianMethod = new HungarianMethod(grid, potentialVictims);
-			route = hungarianMethod.findRoute();
-		}
-		
-		// no more victims to pick up
-		if (potentialVictims.isEmpty() && nonUrgentVictims.isEmpty()) {
-			pathFinder.findPath(path, grid.getCurrentCell(), grid.getCell(0, 0));
-		}
-		
-		// pick up non-urgent victim
-		if (potentialVictims.isEmpty() && !nonUrgentVictims.isEmpty()) {
-			hungarianMethod = new HungarianMethod(grid, nonUrgentVictims);
-			route = hungarianMethod.findRoute();
-			pcMonitor.setRoute(route);
-		}
-		
-		// go to next route location
 		if (path.isEmpty()) {
-			destination = route.remove(0);
+			potentialVictims = grid.getPotentialVictims();
+			nonUrgentVictims = grid.getNonUrgentVictims();
+			
+			if (potentialVictims.isEmpty()) {
+				// no more victims to pick up
+				if (nonUrgentVictims.isEmpty()) {
+					pathFinder.findPath(path, grid.getCurrentCell(), grid.getCell(0, 0));
+				} else {
+					// pick up non-urgent victim
+					if (nonUrgentVictims.contains(grid.getCurrentCell())) {
+						grid.getCurrentCell().setStatus(0);
+						route.clear();
+						
+					// travel to non-urgent victim
+					} else {
+						hungarianMethod = new HungarianMethod(grid, nonUrgentVictims);
+						route = hungarianMethod.findRoute();
+					}
+				}
+				
+			// dropped urgent victims off at this hospital
+			} else if (route.isEmpty()) {
+				hungarianMethod = new HungarianMethod(grid, potentialVictims);
+				route = hungarianMethod.findRoute();
+			}
+			
+			destination = route.isEmpty() ? grid.getCell(0, 0) : route.remove(0);
 			pathFinder.findPath(path, grid.getCurrentCell(), destination);
 		}
 		
