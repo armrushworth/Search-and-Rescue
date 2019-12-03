@@ -31,11 +31,20 @@ public class PilotRobot {
 	// set up the color sensors
 	private void setupColorSensors() {
 		leftColorSensor = new EV3ColorSensor(ev3.getPort("S1"));
-		leftColorSampleProvider = leftColorSensor.getRGBMode();
-		leftColorSample = new float[leftColorSampleProvider.sampleSize()];
 		rightColorSensor = new EV3ColorSensor(ev3.getPort("S4"));
-		rightColorSampleProvider = rightColorSensor.getRGBMode();
+		setRGBMode();
+		leftColorSample = new float[leftColorSampleProvider.sampleSize()];
 		rightColorSample = new float[rightColorSampleProvider.sampleSize()];
+	}
+	
+	public void setRGBMode() {
+		leftColorSampleProvider = leftColorSensor.getRGBMode();
+		rightColorSampleProvider = rightColorSensor.getRGBMode();
+	}
+	
+	public void setColorIDMode() {
+		leftColorSampleProvider = leftColorSensor.getColorIDMode();
+		rightColorSampleProvider = rightColorSensor.getColorIDMode();
 	}
 	
 	// set up the gyro sensor

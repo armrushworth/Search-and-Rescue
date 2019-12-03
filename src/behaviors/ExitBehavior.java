@@ -41,7 +41,7 @@ public class ExitBehavior implements Behavior{
 		suppressed = false;
 		
 		myRobot.getBrick().getAudio().systemSound(0);
-		while (Button.ESCAPE.isDown()) {
+		while (!Button.ESCAPE.isDown()) {
 			pilotMonitor.terminate();
 			myRobot.closeRobot();
 			if (pcMonitor != null) {
