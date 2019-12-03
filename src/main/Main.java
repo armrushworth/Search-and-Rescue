@@ -58,7 +58,10 @@ public class Main {
 			e.printStackTrace();
 		}
 		pcMonitor.start();
-		pcMonitor.sendError(csc.recentError);
+		if (csc.recentError != null) {
+			pcMonitor.sendError(csc.recentError);
+		}
+
 		
 		if (!useColourChart) {
 			myRobot.resetGyro();
@@ -69,23 +72,29 @@ public class Main {
 		myMonitor.start();
 		
 		try {
-			System.out.println("Awaiting server 3..");
-			Socket agentServer = new Socket("138.253.35.65", 1235);
-			BufferedReader in = new BufferedReader(new InputStreamReader(agentServer.getInputStream()));
+			System.out.println("Awaiting client 3..");
+			ServerSocket agentServer = new ServerSocket(1235);
+			Socket agentClient = agentServer.accept();
 			System.out.println("connecting");
+			BufferedReader in = new BufferedReader(new InputStreamReader(agentClient.getInputStream()));
+			System.out.println("reader established");
 		    Cell[] victims = new Cell[5];
 		    Cell[] obstacles = new Cell[4];
 		    Cell hospital;
 		    String coords;
+		    System.out.println("flag1");
 			for (int i = 0; i < victims.length; i++) {
 				coords = in.readLine();
 				victims[i] = new Cell(Integer.parseInt(coords.split(",")[0]),Integer.parseInt(coords.split(",")[1]));
 			}
+			System.out.println("flag2");
 			for (int i = 0; i < obstacles.length; i++) {
 				coords = in.readLine();
 				obstacles[i] = new Cell(Integer.parseInt(coords.split(",")[0]),Integer.parseInt(coords.split(",")[1]));
 			}
+			System.out.println("flag3");
 			coords = in.readLine();
+			System.out.println("flag4");
 			hospital = new Cell(Integer.parseInt(coords.split(",")[0]),Integer.parseInt(coords.split(",")[1]));
 			System.out.println("Hospital location = " + hospital.getCoordinates().x + " , " + hospital.getCoordinates().y);
 		} catch (UnknownHostException e) {

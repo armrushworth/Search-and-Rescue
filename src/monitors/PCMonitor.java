@@ -133,9 +133,7 @@ public class PCMonitor extends Thread {
 	}
 	
 	public final void sendError(Exception error) {
-		if (error != null) {
 			errorDisplay.println(error.getMessage());
-		}
 	}
 	
 	public final void setDestination (Cell destination) {

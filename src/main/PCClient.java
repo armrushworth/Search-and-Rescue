@@ -138,7 +138,7 @@ public class PCClient extends JFrame {
 					robotStates[i].setIcon(empty);
 				}
 			}
-			if (errorIn.ready() && errorIn.readLine() != null) {
+			if (errorIn.ready()) {
 				errorDisplay.setText(errorIn.readLine());
 			}
 		} catch (IOException e) {

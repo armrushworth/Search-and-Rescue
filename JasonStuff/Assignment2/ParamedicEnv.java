@@ -87,19 +87,22 @@ public class ParamedicEnv extends Environment {
     }
     
     public void sendMapData() {
-		ServerSocket agentSystem = null;
-		Socket agentClient = null;
 		try {
-			System.out.println("Awaiting client Brick..");
-			agentSystem = new ServerSocket(1235);
-			agentClient = agentSystem.accept();
-			System.out.println("Connected");
-			out = new PrintWriter(agentClient.getOutputStream(), true);
+			String ip = "192.168.70.163"; 
+			System.out.println("Awaiting server Brick..");
+			Socket socket = new Socket(ip, 1235);
+			if (socket.isConnected()) {
+				System.out.println("Connected");
+			}
+			
+			out = new PrintWriter(socket.getOutputStream(), true);
+			System.out.println("Writer established");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		for (int i = 0; i < victims.length; i++) {
+			System.out.println("flag");
 			out.println(victims[i].getCoordinates().x + "," + (victims[i].getCoordinates().y));
 		}
 		for (int i = 0; i < obstacles.length; i++) {
