@@ -75,28 +75,27 @@ public class Main {
 			System.out.println("Awaiting client 3..");
 			ServerSocket agentServer = new ServerSocket(1235);
 			Socket agentClient = agentServer.accept();
-			System.out.println("connecting");
 			BufferedReader in = new BufferedReader(new InputStreamReader(agentClient.getInputStream()));
-			System.out.println("reader established");
 		    Cell[] victims = new Cell[5];
 		    Cell[] obstacles = new Cell[4];
 		    Cell hospital;
 		    String coords;
-		    System.out.println("flag1");
 			for (int i = 0; i < victims.length; i++) {
 				coords = in.readLine();
-				victims[i] = new Cell(Integer.parseInt(coords.split(",")[0]),Integer.parseInt(coords.split(",")[1]));
+				int x = Integer.parseInt(coords.split(",")[0]);
+				int y = Integer.parseInt(coords.split(",")[1]);
+				System.out.println("victim:"+ coords);
+				grid.getCell(x, y).setStatus(1);
 			}
-			System.out.println("flag2");
 			for (int i = 0; i < obstacles.length; i++) {
 				coords = in.readLine();
-				obstacles[i] = new Cell(Integer.parseInt(coords.split(",")[0]),Integer.parseInt(coords.split(",")[1]));
+				int x = Integer.parseInt(coords.split(",")[0]);
+				int y = Integer.parseInt(coords.split(",")[1]);
+				System.out.println("obstacle:"+ coords);
+				grid.getCell(x, y).setIsBlocked();
 			}
-			System.out.println("flag3");
 			coords = in.readLine();
-			System.out.println("flag4");
 			hospital = new Cell(Integer.parseInt(coords.split(",")[0]),Integer.parseInt(coords.split(",")[1]));
-			System.out.println("Hospital location = " + hospital.getCoordinates().x + " , " + hospital.getCoordinates().y);
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			pcMonitor.sendError(e);
@@ -108,52 +107,52 @@ public class Main {
 		}
 		
 		// TODO replace with AgentSpeak logic
-		int bayNumber = 4;
-		switch (bayNumber) {
-			case 1:
-				grid.getCell(1, 1).setIsBlocked();
-				grid.getCell(1, 4).setIsBlocked();
-				grid.getCell(4, 1).setIsBlocked();
-				grid.getCell(4, 4).setIsBlocked();
-				grid.getCell(0, 5).setStatus(1);
-				grid.getCell(2, 0).setStatus(1);
-				grid.getCell(2, 2).setStatus(1);
-				grid.getCell(2, 4).setStatus(1);
-				grid.getCell(5, 4).setStatus(1);
-				break;
-			case 2:
-				grid.getCell(1, 3).setIsBlocked();
-				grid.getCell(1, 5).setIsBlocked();
-				grid.getCell(2, 4).setIsBlocked();
-				grid.getCell(3, 3).setIsBlocked();
-				grid.getCell(0, 5).setStatus(1);
-				grid.getCell(2, 3).setStatus(1);
-				grid.getCell(2, 5).setStatus(1);
-				grid.getCell(3, 1).setStatus(1);
-				grid.getCell(5, 5).setStatus(1);
-				break;
-			case 3:
-				grid.getCell(2, 2).setIsBlocked();
-				grid.getCell(3, 2).setIsBlocked();
-				grid.getCell(4, 3).setIsBlocked();
-				grid.getCell(5, 0).setIsBlocked();
-				grid.getCell(0, 2).setStatus(1);
-				grid.getCell(1, 5).setStatus(1);
-				grid.getCell(2, 3).setStatus(1);
-				grid.getCell(4, 5).setStatus(1);
-				grid.getCell(5, 1).setStatus(1);
-				break;
-			case 4:
-				grid.getCell(0, 3).setIsBlocked();
-				grid.getCell(1, 2).setIsBlocked();
-				grid.getCell(1, 4).setIsBlocked();
-				grid.getCell(3, 3).setIsBlocked();
-				grid.getCell(0, 2).setStatus(1);
-				grid.getCell(0, 4).setStatus(1);
-				grid.getCell(1, 3).setStatus(1);
-				grid.getCell(4, 3).setStatus(1);
-				grid.getCell(5, 5).setStatus(1);
-		}
+//		int bayNumber = 4;
+//		switch (bayNumber) {
+//			case 1:
+//				grid.getCell(1, 1).setIsBlocked();
+//				grid.getCell(1, 4).setIsBlocked();
+//				grid.getCell(4, 1).setIsBlocked();
+//				grid.getCell(4, 4).setIsBlocked();
+//				grid.getCell(0, 5).setStatus(1);
+//				grid.getCell(2, 0).setStatus(1);
+//				grid.getCell(2, 2).setStatus(1);
+//				grid.getCell(2, 4).setStatus(1);
+//				grid.getCell(5, 4).setStatus(1);
+//				break;
+//			case 2:
+//				grid.getCell(1, 3).setIsBlocked();
+//				grid.getCell(1, 5).setIsBlocked();
+//				grid.getCell(2, 4).setIsBlocked();
+//				grid.getCell(3, 3).setIsBlocked();
+//				grid.getCell(0, 5).setStatus(1);
+//				grid.getCell(2, 3).setStatus(1);
+//				grid.getCell(2, 5).setStatus(1);
+//				grid.getCell(3, 1).setStatus(1);
+//				grid.getCell(5, 5).setStatus(1);
+//				break;
+//			case 3:
+//				grid.getCell(2, 2).setIsBlocked();
+//				grid.getCell(3, 2).setIsBlocked();
+//				grid.getCell(4, 3).setIsBlocked();
+//				grid.getCell(5, 0).setIsBlocked();
+//				grid.getCell(0, 2).setStatus(1);
+//				grid.getCell(1, 5).setStatus(1);
+//				grid.getCell(2, 3).setStatus(1);
+//				grid.getCell(4, 5).setStatus(1);
+//				grid.getCell(5, 1).setStatus(1);
+//				break;
+//			case 4:
+//				grid.getCell(0, 3).setIsBlocked();
+//				grid.getCell(1, 2).setIsBlocked();
+//				grid.getCell(1, 4).setIsBlocked();
+//				grid.getCell(3, 3).setIsBlocked();
+//				grid.getCell(0, 2).setStatus(1);
+//				grid.getCell(0, 4).setStatus(1);
+//				grid.getCell(1, 3).setStatus(1);
+//				grid.getCell(4, 3).setStatus(1);
+//				grid.getCell(5, 5).setStatus(1);
+//		}
 		
 		// set up the behaviours for the arbitrator and construct it
 		Behavior b1 = new MoveBehavior(myRobot, grid, path, csc);

@@ -22,9 +22,9 @@ public class ParamedicEnv extends Environment {
     public static final int GSize = 6; // The bay is a 6x6 grid
     public static final int HOSPITAL  = 8; // hospital code in grid model
     public static final int VICTIM  = 16; // victim code in grid model
-    public Cell[] victims = new Cell[5];
-    public Cell[] obstacles = new Cell[4];
-    public Cell hospital;
+    public String[] victims = new String[5];
+    public String[] obstacles = new String[4];
+    public String hospital;
     public boolean dataSent = false;
     
     // Create objects for visualising the bay.  
@@ -46,7 +46,8 @@ public class ParamedicEnv extends Environment {
                 int y = (int)((NumberTerm)action.getTerm(1)).solve();
                 for (int i = 0; i < victims.length; i++) {
                 	if (victims[i] == null) {
-                		victims[i] = new Cell(x,y);
+                		victims[i] = x+","+y;
+                		break;
                 	}
                 }
             } else if (action.getFunctor().equals("addObstacle")) {
@@ -54,13 +55,14 @@ public class ParamedicEnv extends Environment {
                 int y = (int)((NumberTerm)action.getTerm(1)).solve();
                 for (int i = 0; i < obstacles.length; i++) {
                 	if (obstacles[i] == null) {
-                		obstacles[i] = new Cell(x,y);
+                		obstacles[i] = x+","+y;
+                		break;
                 	}
                 }
             } else if (action.getFunctor().equals("addHospital")) {
                 int x = (int)((NumberTerm)action.getTerm(0)).solve();
                 int y = (int)((NumberTerm)action.getTerm(1)).solve();
-                hospital = new Cell(x,y);
+                hospital = x+","+y;
             } else if (action.getFunctor().equals("sendData")) {
             	sendMapData();
             } else {
@@ -103,12 +105,12 @@ public class ParamedicEnv extends Environment {
 		}
 		for (int i = 0; i < victims.length; i++) {
 			System.out.println("flag");
-			out.println(victims[i].getCoordinates().x + "," + (victims[i].getCoordinates().y));
+			out.println(victims[i]);
 		}
 		for (int i = 0; i < obstacles.length; i++) {
-			out.println(obstacles[i].getCoordinates().x + "," + (obstacles[i].getCoordinates().y));
+			out.println(obstacles[i]);
 		}
-		out.println(hospital.getCoordinates().x + "," + (hospital.getCoordinates().y));
+		out.println(hospital);
 		
     }
     

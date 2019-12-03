@@ -37,7 +37,7 @@
 price(_Service,X) :- .random(R) & X = (10*R)+100.
 
 // the name of the agent who is the initiator in the CNP
-plays(initiator,doctor).
+plays(initiator,doctor4).
 
 // ========================================================================
 // Initial goals
@@ -86,7 +86,8 @@ plays(initiator,doctor).
        .count(location(obstacle,_,_),Ocount);	// Determine the obstacles
        .print("Start the Resuce mission for ",C," critical and ",NC,
     		" non-critical victims; Hospital is at (",X,",",Y,"), and we have ",
-    		Vcount, " victimes and ", Ocount," known obstacles").
+    		Vcount, " victimes and ", Ocount," known obstacles. Connect Brick...");
+			sendData.
  
 // This is our recursive plan that only executes if we have yet to receive
 // the beliefs    

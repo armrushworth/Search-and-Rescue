@@ -37,7 +37,7 @@
 price(_Service,X) :- .random(R) & X = (10*R)+100.
 
 // the name of the agent who is the initiator in the CNP
-plays(initiator,doctor).
+plays(initiator,doctor3).
 
 // ========================================================================
 // Initial goals
