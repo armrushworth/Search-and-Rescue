@@ -100,6 +100,7 @@ public class MoveBehavior implements Behavior {
 				}
 			}
 		} else {
+			myRobot.resetGyro();
 			myPilot.travel(25);
 		}
 		

@@ -57,7 +57,7 @@ public class PCMonitor extends Thread {
 	public void run() {
 		while (running) {
 			// output victim information
-			for (int i = 0; i < 4; i++) {
+			for (int i = 0; i < 5; i++) {
 				if (!potentialVictims.isEmpty()) {
 					String potentialVictimsOutput = "";
 					potentialVictimsOutput += "(" + potentialVictims.get(i).getCoordinates().x + ", " + potentialVictims.get(i).getCoordinates().y + ") ";

@@ -86,7 +86,6 @@ public class Main {
 				coords = in.readLine();
 				int x = Integer.parseInt(coords.split(",")[0]);
 				int y = Integer.parseInt(coords.split(",")[1]);
-				System.out.println("victim:"+ coords);
 				grid.getCell(x, y).setStatus(1);
 				potentialVictims.add(grid.getCell(x, y));
 			}
@@ -94,7 +93,6 @@ public class Main {
 				coords = in.readLine();
 				int x = Integer.parseInt(coords.split(",")[0]);
 				int y = Integer.parseInt(coords.split(",")[1]);
-				System.out.println("obstacle:"+ coords);
 				grid.getCell(x, y).setIsBlocked();
 			}
 			coords = in.readLine();
