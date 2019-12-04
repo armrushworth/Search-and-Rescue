@@ -5,7 +5,6 @@ import jason.environment.*;
 import jason.environment.grid.GridWorldModel;
 import jason.environment.grid.GridWorldView;
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -108,7 +107,12 @@ public class ParamedicEnv extends Environment {
     }
     
     public void sendMapData() {	
-		out = new PrintWriter(socket.getOutputStream(), true);
+		try {
+			out = new PrintWriter(socket.getOutputStream(), true);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		System.out.println("Writer established");
 
 		for (int i = 0; i < victims.length; i++) {
@@ -123,11 +127,10 @@ public class ParamedicEnv extends Environment {
     }
     
     public void listenForResponse() {
-    	BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-    	
+		try {
+			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
-    
-
-    // ======================================================================
 }
-
