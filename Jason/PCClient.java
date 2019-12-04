@@ -121,7 +121,6 @@ public class PCClient extends Thread {
 		try {
 			lRobotStats.setText(
 					"<html><div  style=\"padding: 20px\"><h1>Robot 14</h1>\n"
-						+ in.readLine() + "\n"
 						+ "Victim information:<ol>"
 							+ "<li>" + in.readLine() + "</li>"
 							+ "<li>" + in.readLine() + "</li>"
