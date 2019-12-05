@@ -28,7 +28,9 @@ public class Main {
 	private static ArrayList<Cell> potentialVictims = new ArrayList<Cell>();
 	
 	public static void main(String[] args) {
+		//prevents really annoying bugs when comparing labelled colour samples.
 	    System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
+	    Socket agentClient = null;
 		// Initialise the grid and robot
 		Grid grid = new Grid();
 		PilotRobot myRobot = new PilotRobot();
@@ -76,7 +78,7 @@ public class Main {
 		try {
 			System.out.println("Awaiting client 3..");
 			ServerSocket agentServer = new ServerSocket(1235);
-			Socket agentClient = agentServer.accept();
+			agentClient = agentServer.accept();
 			BufferedReader in = new BufferedReader(new InputStreamReader(agentClient.getInputStream()));
 		    Cell[] victims = new Cell[5];
 		    Cell[] obstacles = new Cell[4];
@@ -159,8 +161,8 @@ public class Main {
 		
 		// set up the behaviours for the arbitrator and construct it
 		Behavior b1 = new MoveBehavior(myRobot, grid, path, csc);
-		Behavior b2 = new SelectDestinationBehavior(myRobot, pcMonitor, csc, grid, route, path);
-		Behavior b3 = new ExitBehavior(myRobot, myMonitor, pcMonitor, grid);
+		Behavior b2 = new SelectDestinationBehavior(myRobot, agentClient, pcMonitor, csc, grid, route, path);
+		Behavior b3 = new ExitBehavior(myRobot, agentClient, myMonitor, pcMonitor, grid);
 		Behavior [] behaviorArray = {b1, b2, b3};
 		Arbitrator arbitrator = new Arbitrator(behaviorArray);
 		arbitrator.go();

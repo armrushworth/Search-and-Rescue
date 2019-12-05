@@ -58,7 +58,7 @@ public class ColourSampleChart {
   private final int sampleSizePerReading = (int) Math.ceil(100/noOfScans);
   
   //All colours that need to be distinguished by the robot.
-  private final String[] colours = {"Black", "White", "Cyan", "Burgundy", "Yellow", "Green"};
+  private final String[] colours = {"Black", "White", "Cyan", "Burgandy", "Yellow", "Green"};
   
   //The value k in the k nearest neighbour algorithm 
   private int k; 

@@ -7,6 +7,7 @@ public class PCClient extends Thread {
 	// bufferd reader this will connect to the socket PCMonitor.java uses
 	private BufferedReader in;
 	private BufferedReader errorIn;
+	public boolean connected = false;
 	
 	//checks if thread is running.
 	private volatile boolean running = true;
@@ -97,6 +98,7 @@ public class PCClient extends Thread {
 			System.out.println("Connected1");
 			Socket errorSocket = new Socket(ip, 1111);
 			System.out.println("Connected2");
+			connected = true;
 			
 			// get Input from PCMonitor.
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));

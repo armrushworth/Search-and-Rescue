@@ -4,6 +4,7 @@ import jason.asSyntax.*;
 import jason.environment.*;
 import jason.environment.grid.GridWorldModel;
 import jason.environment.grid.GridWorldView;
+import jason.asSyntax.parser.ParseException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,6 +43,13 @@ public class ParamedicEnv extends Environment {
     public void init(String[] args) {
         super.init(args);
         pc.start();
+        while (!pc.connected) {
+        	try {
+        		Thread.sleep(500);
+        	} catch (InterruptedException e) {
+        		e.printStackTrace();
+        	}
+        }
         try {
 			String ip = "192.168.70.163"; 
 			System.out.println("Awaiting server Brick..");
@@ -83,6 +91,18 @@ public class ParamedicEnv extends Environment {
                 hospital = x+","+y;
             } else if (action.getFunctor().equals("sendData")) {
             	sendMapData();
+            } else if (action.getFunctor().equals("patientCritical")){
+            	out = new PrintWriter(socket.getOutputStream(), true);
+            	out.println("Critical");
+            	listenForResponse();
+            } else if (action.getFunctor().equals("patientNotCritical")){
+            	out = new PrintWriter(socket.getOutputStream(), true);
+            	out.println("NotCritical");
+            	listenForResponse();
+            } else if (action.getFunctor().equals("noVictim")) {
+            	out = new PrintWriter(socket.getOutputStream(), true);
+            	out.println("NoVictim");
+            	listenForResponse();
             } else {
                 return true;
                 // Note that technically we should return false here.  But that could lead to the
@@ -116,7 +136,6 @@ public class ParamedicEnv extends Environment {
 		System.out.println("Writer established");
 
 		for (int i = 0; i < victims.length; i++) {
-			System.out.println("flag");
 			out.println(victims[i]);
 		}
 		for (int i = 0; i < obstacles.length; i++) {
@@ -128,8 +147,23 @@ public class ParamedicEnv extends Environment {
     
     public void listenForResponse() {
 		try {
+			System.out.println("flag1");
 			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			while (!in.ready()) {
+				Thread.sleep(1000);
+			}
+			System.out.println("flag2");
+			String percept = in.readLine();
+			System.out.println("flag3 " + "colour(" + percept + ")");
+			clearPercepts();
+			addPercept(ASSyntax.parseLiteral("colour(" + percept + ")"));
+			System.out.println("flag4");
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
 			e.printStackTrace();
 		}
     }

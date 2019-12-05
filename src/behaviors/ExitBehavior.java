@@ -1,5 +1,7 @@
 package behaviors;
 
+import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
 
 import lejos.hardware.Button;
@@ -20,12 +22,14 @@ public class ExitBehavior implements Behavior{
 	private ArrayList<Cell> potentialVictims;
 	private ArrayList<Cell> nonUrgentVictims;
 	private Grid grid;
+	private Socket ac;
 	
-	public ExitBehavior(PilotRobot myRobot, PilotMonitor pilotMonitor, PCMonitor pcMonitor, Grid grid) {
+	public ExitBehavior(PilotRobot myRobot, Socket agentClient, PilotMonitor pilotMonitor, PCMonitor pcMonitor, Grid grid) {
 		this.myRobot = myRobot;
 		this.pilotMonitor = pilotMonitor;
 		this.pcMonitor = pcMonitor;
 		this.grid = grid;
+		this.ac = agentClient;
 	}
 	
 	public final void suppress() {
@@ -48,6 +52,12 @@ public class ExitBehavior implements Behavior{
 		myRobot.closeRobot();
 		if (pcMonitor != null) {
 			pcMonitor.terminate();
+		}
+		try {
+			ac.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		System.exit(0);
 	}

@@ -1,7 +1,12 @@
 package behaviors;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.text.ParseException;
 import java.util.ArrayList;
-
 import colourSensorModel.ColourSampleChart;
 import lejos.hardware.Sound;
 import lejos.robotics.subsumption.Behavior;
@@ -27,11 +32,13 @@ public class SelectDestinationBehavior implements Behavior {
 	private Cell destination;
 	private String leftColor;
 	private String rightColor;
+	private Socket agentClient;
 	
-	public SelectDestinationBehavior(PilotRobot myRobot, PCMonitor pcMonitor, ColourSampleChart csc, Grid grid, ArrayList<Cell> route, ArrayList<Cell> path) {
+	public SelectDestinationBehavior(PilotRobot myRobot, Socket agentClient, PCMonitor pcMonitor, ColourSampleChart csc, Grid grid, ArrayList<Cell> route, ArrayList<Cell> path) {
 		pathFinder = new PathFinder(grid.getGrid());
 		this.myRobot = myRobot;
 		this.pcMonitor = pcMonitor;
+		this.agentClient = agentClient;
 		this.csc = csc;
 		this.grid = grid;
 		this.route = route;
@@ -50,29 +57,83 @@ public class SelectDestinationBehavior implements Behavior {
 		suppressed = false;
 		potentialVictims = grid.getPotentialVictims();
 		nonUrgentVictims = grid.getNonUrgentVictims();
-		
-		// reached a potential victim
-		if (potentialVictims.contains(grid.getCurrentCell())) {
+		if (grid.getCurrentCell().getStatus() == 1) {
+			// reached a potential victim
 			myRobot.setRGBMode();
-			leftColor = csc.findColor(myRobot.getLeftColor(), true);
-			rightColor = csc.findColor(myRobot.getRightColor(), false);
-			if ((leftColor.equals("White") || leftColor.equals("Yellow")) && (rightColor.equals("White") || rightColor.equals("Yellow"))) {
-				// no victim
-				Sound.buzz();
-				grid.getCurrentCell().setStatus(0);
-			} else if (leftColor.equals("Cyan") && rightColor.equals("Cyan")) {
-				// non-urgent victim
-				Sound.beep();
-				grid.getCurrentCell().setStatus(2);
-			} else if (leftColor.equals("Burgundy") && rightColor.equals("Burgundy")) {
-				// urgent victim
-				Sound.twoBeeps();
-				grid.getCurrentCell().setStatus(4);
-				route.clear();
-				pathFinder.findPath(path, grid.getCurrentCell(), grid.getCell(0, 0));
-				destination = grid.getCell(0, 0);
-			}
+			//make sure both sensors read the same colour
+			System.out.println("flag1");
+			do {
+				leftColor = csc.findColor(myRobot.getLeftColor(), true);
+				rightColor = csc.findColor(myRobot.getRightColor(), false);
+			} while (!leftColor.equals(rightColor));
+			System.out.println("flag2");
+			//check if the detected colour is a victim
+			System.out.println("flag3");
+			try {
+				//Tell the jason enviroment that a patient is found at X,Y and its colour.
+				PrintWriter out = new PrintWriter(agentClient.getOutputStream(), true);
+				//Prints out the variables for the jason enviroments new percept. X,Y,C.
+				out.println(grid.getCurrentCell().getCoordinates().x + ","
+							+ grid.getCurrentCell().getCoordinates().y + ","
+							+ leftColor.toLowerCase());
+				System.out.println("flag4");
+				BufferedReader in = new BufferedReader(new InputStreamReader(agentClient.getInputStream()));
+				//wait for agent response
+				while (!in.ready()) {
+					Thread.sleep(1000);
+				}
+				String paramedicResponse = in.readLine();
+				System.out.println("flag5");
+				//check response and respond accordingly
+				if (paramedicResponse.equals("NotCritical")) {
+					//Not urgent
+					Sound.beep();
+					grid.getCurrentCell().setStatus(2);
+				} else if (paramedicResponse.equals("Critical")) {
+					System.out.println("flag6");
+				//urgent
+					Sound.twoBeeps();
+					grid.getCurrentCell().setStatus(4);
+					route.clear();
+					pathFinder.findPath(path, grid.getCurrentCell(), grid.getCell(0, 0));
+					destination = grid.getCell(0, 0);
+					System.out.println("flag7");
+				} else if (paramedicResponse.equals("NoVictim")) {
+					//no victim
+					Sound.buzz();
+					grid.getCurrentCell().setStatus(0);
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				pcMonitor.sendError(e);
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				pcMonitor.sendError(e);
+			} 
 		}
+//		if (potentialVictims.contains(grid.getCurrentCell())) {
+//			myRobot.setRGBMode();
+//			leftColor = csc.findColor(myRobot.getLeftColor(), true);
+//			rightColor = csc.findColor(myRobot.getRightColor(), false);
+//			if ((leftColor.equals("White") || leftColor.equals("Yellow")) && (rightColor.equals("White") || rightColor.equals("Yellow"))) {
+//				// no victim
+//				Sound.buzz();
+//				grid.getCurrentCell().setStatus(0);
+//			} else if (leftColor.equals("Cyan") && rightColor.equals("Cyan")) {
+//				// non-urgent victim
+//				Sound.beep();
+//				grid.getCurrentCell().setStatus(2);
+//			} else if (leftColor.equals("Burgundy") && rightColor.equals("Burgundy")) {
+//				// urgent victim
+//				Sound.twoBeeps();
+//				grid.getCurrentCell().setStatus(4);
+//				route.clear();
+//				pathFinder.findPath(path, grid.getCurrentCell(), grid.getCell(0, 0));
+//				destination = grid.getCell(0, 0);
+//			}
+//		}
 		
 		if (path.isEmpty()) {
 			potentialVictims = grid.getPotentialVictims();

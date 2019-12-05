@@ -1,6 +1,5 @@
 // Paramedic Agent
 // 23rd November 2018 - Terry Payne
-// 05/12/2019 - edited by Jamie Daniels 201179653
 // This is the AgentSpeak code for an example paramedic agent, that
 // responds to a call to assist in rescuing victims, based on triaging
 // possible victims in a number of candidate locations.  This is partially
@@ -145,34 +144,9 @@ plays(initiator,doctor3).
 //			!requestVictimStatus(A,3,1,burgandy);
 //			!requestVictimStatus(A,3,2,cyan);
 
-+colour(X,Y,burgandy) [source(percept)] 
-	<- .print("A flag1");
-		!requestVictimStatus(doctor3,X,Y,C).
-		
-+colour(X,Y,cyan) [source(percept)] 
-	<- !requestVictimStatus(doctor3,X,Y,C).
-		
-+colour(X,Y,white) [source(percept)] 
-	<- noVictim.
-	
-+colour(X,Y,green) [source(percept)] 
-	<- noVictim.
-	
-+colour(X,Y,yellow) [source(percept)] 
-	<- noVictim.
-	
-+colour(X,Y,black) [source(percept)] 
-	<- noVictim.
-	
 +!requestVictimStatus(D,X,Y,C)
-    <- .print("A flag2");
-	   .send(D, tell, requestVictimStatus(X,Y,C)).
-
-
-//+colour(X,Y,cyan) [source(percept)] 
-//	<- .print("Aflag2");
-//	!requestVictimStatus(doctor4,X,Y,cyan).
-
+    <- .send(D, tell, requestVictimStatus(X,Y,C)).
+    
 // ========================================================================
 // End 
 // ========================================================================
