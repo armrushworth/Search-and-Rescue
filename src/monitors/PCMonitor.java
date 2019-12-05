@@ -88,13 +88,13 @@ public class PCMonitor extends Thread {
 			
 			// output the path
 			if (!path.isEmpty()) {
-				String pathOutput = (destination != null) ? "(" + destination.getCoordinates().x + ", " + destination.getCoordinates().y + "), " : "";
+				String pathOutput = "";
 				for (Cell cell : path) {
 					pathOutput += "(" + cell.getCoordinates().x + ", " + cell.getCoordinates().y + "), ";
 				}
 				out.println(pathOutput.substring(0, pathOutput.length() - 2));
 			} else {
-				out.println("null");
+				out.println(destination != null ? "(" + destination.getCoordinates().x + ", " + destination.getCoordinates().y + "), " : "null");
 			}
 			
 			// output the route
@@ -105,7 +105,7 @@ public class PCMonitor extends Thread {
 				}
 				out.println(routeOutput.substring(0, routeOutput.length() - 2));
 			} else {
-				out.println("null");
+				out.println(destination != null ? "(" + destination.getCoordinates().x + ", " + destination.getCoordinates().y + "), " : "null");
 			}
 			
 			// output sensor information
