@@ -42,6 +42,13 @@ public class ParamedicEnv extends Environment {
     public void init(String[] args) {
         super.init(args);
         pc.start();
+        while (!pc.connected) {
+        	try {
+        		Thread.sleep(500);
+        	} catch (InterruptedException e) {
+        		e.printStackTrace();
+        	}
+        }
         try {
 			String ip = "192.168.70.163"; 
 			System.out.println("Awaiting server Brick..");
