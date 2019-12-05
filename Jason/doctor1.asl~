@@ -35,9 +35,9 @@ location(victim,0,5).
 // ========================================================================
 // The following beliefs MUST NOT be shared, but represent the location of
 // actual victims and their critical status
-critical(2,0).
-critical(2,2).
-~critical(5,4).
+~critical(2,0).
+~critical(2,2).
+critical(5,4).
 
 // ========================================================================
 // Initial goals

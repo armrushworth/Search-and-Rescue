@@ -1,6 +1,7 @@
 package particleFilter;
 
 import java.awt.Point;
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -18,7 +19,9 @@ public class ParticleFilter {
   Particle[] particles;
   
   //The total number of particles this is used incase we need to change the number of particles used.
-  int totalParticles;
+  public int totalParticles;
+  HashMap<String,Integer> particlesPerCell;
+  String bestCell;
   
   //Random number generator used for selecting the fittest particles.
   Random randNum = new Random();
@@ -33,12 +36,14 @@ public class ParticleFilter {
   public ParticleFilter(Point[] landmarks, int width, int height) {
     this.totalParticles = width*height*4;
     particles = new Particle[totalParticles];
+    int particleCounter = 0;
     for (int i = 0; i < width; i++) {
       for (int j = 0; j < height; j++ ) {
-        particles[i] = new Particle(landmarks, width, height, i, j, 0);//north
-        particles[i] = new Particle(landmarks, width, height, i, j, Math.PI/2); //east
-        particles[i] = new Particle(landmarks, width, height, i, j, Math.PI); //south
-        particles[i] = new Particle(landmarks, width, height, i, j, 3*Math.PI/2); //west
+        particles[particleCounter] = new Particle(landmarks, width, height, i, j, 0);//north
+        particles[particleCounter+1] = new Particle(landmarks, width, height, i, j, 90); //east
+        particles[particleCounter+2] = new Particle(landmarks, width, height, i, j, 180); //south
+        particles[particleCounter+3] = new Particle(landmarks, width, height, i, j, 270); //west
+        particleCounter += 4;
       }
     }
   }
@@ -53,11 +58,13 @@ public class ParticleFilter {
     }
   }
   
-  public void resample(float[] measurement) {
+  public void resample(float measurement) {
+	  if (measurement > 250) measurement = 150;
     Particle[] newParticles = new Particle[totalParticles];
     
     for (int i = 0; i < totalParticles; i++) {
-      particles[i].calculateProbability(measurement);
+    	double weight = particles[i].calculateWeight(measurement);
+    	System.out.println(weight);
     }
     
     float B = 0f;
@@ -65,9 +72,9 @@ public class ParticleFilter {
     Particle best = getBestParticle();
     int index = (int) randNum.nextFloat() * totalParticles;
     for (int i = 0; i < totalParticles; i++) {
-      B += randNum.nextFloat() * 2f * best.probability;
-      while (B > particles[index].probability) {
-        B -= particles[index].probability;
+      B += randNum.nextFloat() * 2f * best.weight;
+      while (B > particles[index].weight) {
+        B -= particles[index].weight;
         index = circle(index + 1, totalParticles);
       }
       newParticles[i] = new Particle(particles[index].landmarks,
@@ -76,8 +83,9 @@ public class ParticleFilter {
                                      particles[index].x,
                                      particles[index].y,
                                      particles[index].orientation);
-      newParticles[i].setProb(particles[index].probability);
+      newParticles[i].setWeight(particles[index].weight);
     }
+    particles = newParticles;
   }
   
   private int circle(int num, int length) {
@@ -93,11 +101,40 @@ public class ParticleFilter {
   public Particle getBestParticle() {
     Particle particle = particles[0];
     for (int i = 0; i < totalParticles; i++) {
-      if (particles[i].probability > particle.probability) {
+      if (particles[i].weight > particle.weight) {
         particle = particles[i];
       }
     }
     return particle;
+  }
+  
+  
+  public void calculateBestCell() {
+	particlesPerCell = new HashMap<String,Integer>();
+	int max = 1;
+	String temp = "";
+	for (int i = 0; i < totalParticles; i++) {
+		if (particlesPerCell.get(particles[i].x + "," + particles[i].y) != null) {
+			int count = particlesPerCell.get(particles[i].x + "," + particles[i].y);
+			count++;
+			particlesPerCell.put(particles[i].x + "," + particles[i].y, count);
+			if (count > max) {
+				max = count;
+				temp = particles[i].x + "," + particles[i].y;
+			}
+		} else {
+			particlesPerCell.put(particles[i].x + "," + particles[i].y, 1);
+		}
+	}
+	bestCell = temp;
+  }
+  
+  public String getBestCell() {
+	  return bestCell;
+  }
+  
+  public int getBestNumOfParticles() {
+	  return particlesPerCell.get(bestCell);
   }
   
 }

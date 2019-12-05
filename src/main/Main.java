@@ -10,6 +10,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import behaviors.ExitBehavior;
+import behaviors.Localiser;
 import behaviors.MoveBehavior;
 import behaviors.SelectDestinationBehavior;
 import colourSensorModel.ColourSampleChart;
@@ -23,6 +24,7 @@ public class Main {
 	private static final int PORT = 1234; // server port between pc client and robot
 	private static ServerSocket server; // server socket used between robot and pc client.
 	private static boolean useColourChart = true;
+	private static boolean useLocalise = true;
 	private static ArrayList<Cell> route = new ArrayList<Cell>();
 	private static ArrayList<Cell> path = new ArrayList<Cell>();
 	private static ArrayList<Cell> potentialVictims = new ArrayList<Cell>();
@@ -46,6 +48,7 @@ public class Main {
 			//Generates new colour samples
 			csc = new ColourSampleChart(myRobot);
 		}
+		
 		
 		// start the pc monitor
 		PCMonitor pcMonitor = null;
@@ -74,14 +77,14 @@ public class Main {
 		// start the pilot monitor
 		PilotMonitor myMonitor = new PilotMonitor(grid);
 		myMonitor.start();
-		
+		Cell[] obstacles = null;
 		try {
 			System.out.println("Awaiting client 3..");
 			ServerSocket agentServer = new ServerSocket(1235);
 			agentClient = agentServer.accept();
 			BufferedReader in = new BufferedReader(new InputStreamReader(agentClient.getInputStream()));
 		    Cell[] victims = new Cell[5];
-		    Cell[] obstacles = new Cell[4];
+		    obstacles = new Cell[4];
 		    Cell hospital;
 		    String coords;
 			for (int i = 0; i < victims.length; i++) {
@@ -95,6 +98,7 @@ public class Main {
 				coords = in.readLine();
 				int x = Integer.parseInt(coords.split(",")[0]);
 				int y = Integer.parseInt(coords.split(",")[1]);
+				obstacles[i] = new Cell(x,y);
 				grid.getCell(x, y).setIsBlocked();
 			}
 			coords = in.readLine();
@@ -157,12 +161,17 @@ public class Main {
 //				grid.getCell(5, 5).setStatus(1);
 //		}
 		
-		Sound.beepSequenceUp();
 		
+//		Localiser l = new Localiser(myRobot, obstacles, grid, csc);
+//		l.localise();
+		Sound.beepSequenceUp();
 		// set up the behaviours for the arbitrator and construct it
 		Behavior b1 = new MoveBehavior(myRobot, grid, path, csc);
 		Behavior b2 = new SelectDestinationBehavior(myRobot, agentClient, pcMonitor, csc, grid, route, path);
 		Behavior b3 = new ExitBehavior(myRobot, agentClient, myMonitor, pcMonitor, grid);
+		if (!useLocalise) {
+			grid.setCurrentCell(grid.getCell(0, 0));
+		}
 		Behavior [] behaviorArray = {b1, b2, b3};
 		Arbitrator arbitrator = new Arbitrator(behaviorArray);
 		arbitrator.go();

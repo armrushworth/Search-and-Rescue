@@ -1,6 +1,6 @@
 // Paramedic Agent
 // 23rd November 2018 - Terry Payne
-// 05/12/2019 - edited by Jamie Daniels 201179653
+// 05/12/2019 - edited by Jamie Daniels 201
 // This is the AgentSpeak code for an example paramedic agent, that
 // responds to a call to assist in rescuing victims, based on triaging
 // possible victims in a number of candidate locations.  This is partially
@@ -38,7 +38,7 @@
 price(_Service,X) :- .random(R) & X = (10*R)+100.
 
 // the name of the agent who is the initiator in the CNP
-plays(initiator,doctor3).
+plays(initiator,doctor4).
 
 // ========================================================================
 // Initial goals
@@ -147,10 +147,10 @@ plays(initiator,doctor3).
 
 +colour(X,Y,burgandy) [source(percept)] 
 	<- .print("A flag1");
-		!requestVictimStatus(doctor3,X,Y,C).
+		!requestVictimStatus(doctor4,X,Y,C).
 		
 +colour(X,Y,cyan) [source(percept)] 
-	<- !requestVictimStatus(doctor3,X,Y,C).
+	<- !requestVictimStatus(doctor4,X,Y,C).
 		
 +colour(X,Y,white) [source(percept)] 
 	<- noVictim.
