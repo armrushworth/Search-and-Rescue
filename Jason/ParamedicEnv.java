@@ -147,17 +147,13 @@ public class ParamedicEnv extends Environment {
     
     public void listenForResponse() {
 		try {
-			System.out.println("flag1");
 			BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			while (!in.ready()) {
 				Thread.sleep(1000);
 			}
-			System.out.println("flag2");
 			String percept = in.readLine();
-			System.out.println("flag3 " + "colour(" + percept + ")");
 			clearPercepts();
 			addPercept(ASSyntax.parseLiteral("colour(" + percept + ")"));
-			System.out.println("flag4");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
