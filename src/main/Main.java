@@ -29,6 +29,7 @@ public class Main {
 	private static ArrayList<Cell> route = new ArrayList<Cell>();
 	private static ArrayList<Cell> path = new ArrayList<Cell>();
 	private static ArrayList<Cell> potentialVictims = new ArrayList<Cell>();
+	private static ArrayList<Cell> obstaclesList = new ArrayList<Cell>();
 	
 	public static void main(String[] args) {
 		//prevents really annoying bugs when comparing labelled colour samples.
@@ -61,7 +62,7 @@ public class Main {
 			ServerSocket errorServer = new ServerSocket(1111);
 			Socket errorClient = errorServer.accept();
 			
-			pcMonitor = new PCMonitor(client, errorClient, myRobot, grid, potentialVictims, csc);
+			pcMonitor = new PCMonitor(client, errorClient, myRobot, grid, potentialVictims, obstaclesList, csc);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -99,6 +100,7 @@ public class Main {
 				int y = Integer.parseInt(coords.split(",")[1]);
 				obstacles[i] = new Cell(x,y);
 				grid.getCell(x, y).setIsBlocked();
+				obstaclesList.add(grid.getCell(x, y));
 			}
 			coords = in.readLine();
 			hospital = new Cell(Integer.parseInt(coords.split(",")[0]),Integer.parseInt(coords.split(",")[1]));

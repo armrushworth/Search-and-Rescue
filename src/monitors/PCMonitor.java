@@ -27,6 +27,7 @@ public class PCMonitor extends Thread {
 	private PilotRobot robot;
 
 	private ArrayList<Cell> potentialVictims;
+	private ArrayList<Cell> obstacles;
 	
 	private Grid grid;
 	
@@ -36,12 +37,13 @@ public class PCMonitor extends Thread {
 	private Cell destination = null;
 	private ArrayList<Cell> path = new ArrayList<Cell>();
 
-	public PCMonitor(Socket client, Socket errorSocket, PilotRobot robot, Grid grid, ArrayList<Cell> potentialVictims, ColourSampleChart csc) {
+	public PCMonitor(Socket client, Socket errorSocket, PilotRobot robot, Grid grid, ArrayList<Cell> potentialVictims, ArrayList<Cell> obstacles, ColourSampleChart csc) {
 		this.client = client;
 		this.errorSocket = errorSocket;
 		this.robot = robot;
 		this.grid = grid;
 		this.potentialVictims = potentialVictims;
+		this.obstacles = obstacles;
 		this.csc = csc;
 		
 		try {
@@ -147,6 +149,13 @@ public class PCMonitor extends Thread {
 				potentialVictimsOutput += potentialVictim.toString() + "," + potentialVictim.getStatus() + ",";
 			}
 			out.println(potentialVictimsOutput);
+			
+			// ouptut the locations of obstacles
+			String obstaclesOutput = "";
+			for (Cell obstacle : obstacles) {
+				obstaclesOutput += obstacle.toString() + ",";
+			}
+			out.println(obstaclesOutput);
 			
 			out.flush();
 			
