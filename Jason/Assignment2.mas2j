@@ -29,7 +29,7 @@ MAS assignment2 {
 
 	agents:
 		paramedic;
-		doctor4;
+		doctor3;
 
 	aslSourcePath:
 		"src/asl";

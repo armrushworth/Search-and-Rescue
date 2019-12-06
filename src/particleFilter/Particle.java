@@ -30,7 +30,7 @@ public class Particle {
   public int worldHeight, worldWidth;
   
   //The probability that this particle is in the actual state.
-  public double weight = 0;
+  public int weight = 0;
   
   //A list of known location that the sensor will pickup.
   public Point[] landmarks;
@@ -63,7 +63,7 @@ public class Particle {
    * @param o orientation of the particle in radians.
    * @param prob Probability of being in the correct state.
    */
-  public void setWeight(double weight) {
+  public void setWeight(int weight) {
     this.weight = weight;
   }
   
@@ -96,84 +96,86 @@ public class Particle {
   public double calculateWeight(float measurement) {
     double prob = 1.0;
     float angle = 0;
-    float distC = 0;
+    int numberOfCellsInSensorReading = (int) (measurement / 25);
     for (int i = 0; i < landmarks.length; i++) {
+    	//If particle is on the landmark this is an impossible position for the robot so return a weight of 0
       if (x == landmarks[i].x && y == landmarks[i].y) {
         prob = 0;
         return 0;
+      //calculate how many landmarks the particle could detect with the recent sensor reading.
       } else {
         //calculate sensor distance reading in number of cells and round up.
-        int sensorReadingInCells = (int) Math.ceil(measurement/25);
+        int sensorReadingInCells = (int) Math.ceil(measurement/25) + 1;
         
-        //Distance between robot and landmark.
-        float distA = (float) distance(x, y, landmarks[i].x, landmarks[i].y);
-        //distB would be just the ultrasound sensor reading value.
-        //distC is the distance between the obstacle that caused the sensor reading and the landmark
-        distC = 0;
+//        //Distance between robot and landmark.
+//        float distA = (float) distance(x, y, landmarks[i].x, landmarks[i].y);
+//        //distB would be just the ultrasound sensor reading value.
+//        //distC is the distance between the obstacle that caused the sensor reading and the landmark
+//        distC = 0;
         
         //check if the particle is facing north, east, south or west.
         //north
         if (orientation == 360 || orientation == 0) {
-          distC = (float) distance(x, y + sensorReadingInCells, landmarks[i].x, landmarks[i].y);
+          if ((y + numberOfCellsInSensorReading) == landmarks[i].y && x == landmarks[i].x) {
+        	  weight++;
+          }
         //south
         } else if (orientation == 180) {
-          distC = (float) distance(x, y - sensorReadingInCells, landmarks[i].x, landmarks[i].y);
+        	if ((y - numberOfCellsInSensorReading) == landmarks[i].y && x == landmarks[i].x) {
+          	  weight++;
+            }
         //east
         } else if (orientation == 90) {
-          distC = (float) distance(x + sensorReadingInCells, y, landmarks[i].x, landmarks[i].y);
+        	if (y == landmarks[i].y && (x + numberOfCellsInSensorReading) == landmarks[i].x) {
+          	  weight++;
+            }
         //west
         } else if (orientation == 270) {
-          distC = (float) distance(x - sensorReadingInCells, y, landmarks[i].x, landmarks[i].y);
+        	if (y == landmarks[i].y && (x - numberOfCellsInSensorReading) == landmarks[i].x) {
+            	  weight++;
+              }
         }
-//        if (distA == 0 || distC == 0) System.out.println(distA + " , " + distC);
-        angle = cosineRule(distA, measurement, distC);
-        
-
-        //we need to calculate 2 gaussian functions and times them  together to get weight/probability for the particle
-        //2 functions for the distance and angle diffrence between the landmark and sensor reading.
-//        System.out.println(distC + " , " + measurement);
       }
     }
-    weight *= gaussian(prob, prob, prob);
     return weight;
   }
   
-  private float cosineRule(float a, float b, float c) {
-    if (a == 0 || b == 0) return 0;
-    return (float) Math.acos((
-        Math.pow(a,2) + 
-        Math.pow(b,2) -
-        Math.pow(c, 2)) /
-        2*a*b);
-  }
-  private double distance(int x1, int y1, int x2, int y2) {
-	  x1 *= 25;
-	  y1 *= 25;
-	  x2 *= 25;
-	  y2 *= 25;
-    return Math.sqrt(Math.pow((x1-x2),2) + Math.pow((y1-y2), 2));
-  }
+//  private float cosineRule(float a, float b, float c) {
+//    if (a == 0 || b == 0) return 0;
+//    return (float) Math.acos((
+//        Math.pow(a,2) + 
+//        Math.pow(b,2) -
+//        Math.pow(c, 2)) /
+//        2*a*b);
+//  }
+//  private double distance(int x1, int y1, int x2, int y2) {
+//	  x1 *= 25;
+//	  y1 *= 25;
+//	  x2 *= 25;
+//	  y2 *= 25;
+//    return Math.sqrt(Math.pow((x1-x2),2) + Math.pow((y1-y2), 2));
+//  }
   
 //  public double[] measure(double orientation, double x, double y) {
 //	  
 //  }
   
-	/**
-	 * Gaussian probabilty density function
-	 * 
-	 * @param mu
-	 * @param sigma
-	 * @param x
-	 * @return probability
-	 */
-	public final static double gaussian(double mu, double sigma, double x) {
-		return (1 / (sigma * Math.sqrt(2.0 * Math.PI))) * Math.exp(-0.5 * Math.pow(((x - mu) / sigma), 2));
-	}
+//	/**
+//	 * Gaussian probabilty density function
+//	 * 
+//	 * @param mu
+//	 * @param sigma
+//	 * @param x
+//	 * @return probability
+//	 */
+//	public final static double gaussian(double mu, double sigma, double x) {
+//		return (1 / (sigma * Math.sqrt(2.0 * Math.PI))) * Math.exp(-0.5 * Math.pow(((x - mu) / sigma), 2));
+//	}
   
-  private double calWeight(double particle, double sensor) {
-	  if (particle == 0 && sensor == 0) return 2;
-	  if (Math.abs(sensor - particle) == 0) return 2;
-	  return Math.round(10000*1/Math.pow(Math.abs(sensor - particle),2))/10000;
-  }
+//  private double calWeight(double particle, double sensor) {
+//	  if (particle == 0 && sensor == 0) return 2;
+//	  if (Math.abs(sensor - particle) == 0) return 2;
+//	  return Math.round(10000*1/Math.pow(Math.abs(sensor - particle),2))/10000;
+//  }
    
 }

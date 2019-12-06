@@ -38,7 +38,7 @@
 price(_Service,X) :- .random(R) & X = (10*R)+100.
 
 // the name of the agent who is the initiator in the CNP
-plays(initiator,doctor4).
+plays(initiator,doctor3).
 
 // ========================================================================
 // Initial goals
@@ -147,10 +147,10 @@ plays(initiator,doctor4).
 
 +colour(X,Y,burgandy) [source(percept)] 
 	<- .print("A flag1");
-		!requestVictimStatus(doctor4,X,Y,C).
+		!requestVictimStatus(doctor3,X,Y,C).
 		
 +colour(X,Y,cyan) [source(percept)] 
-	<- !requestVictimStatus(doctor4,X,Y,C).
+	<- !requestVictimStatus(doctor3,X,Y,C).
 		
 +colour(X,Y,white) [source(percept)] 
 	<- noVictim.

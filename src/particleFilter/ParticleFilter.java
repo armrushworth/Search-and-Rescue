@@ -59,7 +59,6 @@ public class ParticleFilter {
   }
   
   public void resample(float measurement) {
-	  if (measurement > 250) measurement = 150;
     Particle[] newParticles = new Particle[totalParticles];
     
     for (int i = 0; i < totalParticles; i++) {
@@ -114,16 +113,16 @@ public class ParticleFilter {
 	int max = 1;
 	String temp = "";
 	for (int i = 0; i < totalParticles; i++) {
-		if (particlesPerCell.get(particles[i].x + "," + particles[i].y) != null) {
-			int count = particlesPerCell.get(particles[i].x + "," + particles[i].y);
+		if (particlesPerCell.get(particles[i].x + "," + particles[i].y + "," + (int)(particles[i].orientation)) != null) {
+			int count = particlesPerCell.get(particles[i].x + "," + particles[i].y + "," + (int)(particles[i].orientation));
 			count++;
-			particlesPerCell.put(particles[i].x + "," + particles[i].y, count);
+			particlesPerCell.put(particles[i].x + "," + particles[i].y + "," + (int)(particles[i].orientation), count);
 			if (count > max) {
 				max = count;
-				temp = particles[i].x + "," + particles[i].y;
+				temp = particles[i].x + "," + particles[i].y + "," + (int)(particles[i].orientation);
 			}
 		} else {
-			particlesPerCell.put(particles[i].x + "," + particles[i].y, 1);
+			particlesPerCell.put(particles[i].x + "," + particles[i].y + "," + (int)(particles[i].orientation), 1);
 		}
 	}
 	bestCell = temp;
