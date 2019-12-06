@@ -8,6 +8,8 @@ import java.net.Socket;
 import java.text.ParseException;
 import java.util.ArrayList;
 import colourSensorModel.ColourSampleChart;
+import lejos.hardware.BrickFinder;
+import lejos.hardware.LED;
 import lejos.hardware.Sound;
 import lejos.robotics.subsumption.Behavior;
 import main.Cell;
@@ -33,6 +35,7 @@ public class SelectDestinationBehavior implements Behavior {
 	private String leftColor;
 	private String rightColor;
 	private Socket agentClient;
+	private LED led;
 	
 	public SelectDestinationBehavior(PilotRobot myRobot, Socket agentClient, PCMonitor pcMonitor, ColourSampleChart csc, Grid grid, ArrayList<Cell> route, ArrayList<Cell> path) {
 		pathFinder = new PathFinder(grid.getGrid());
@@ -43,6 +46,7 @@ public class SelectDestinationBehavior implements Behavior {
 		this.grid = grid;
 		this.route = route;
 		this.path = path;
+		this.led = BrickFinder.getLocal().getLED();
 	}
 	
 	public final void suppress() {
@@ -61,14 +65,11 @@ public class SelectDestinationBehavior implements Behavior {
 			// reached a potential victim
 			myRobot.setRGBMode();
 			//make sure both sensors read the same colour
-			System.out.println("flag1");
 			do {
 				leftColor = csc.findColor(myRobot.getLeftColor(), true);
 				rightColor = csc.findColor(myRobot.getRightColor(), false);
 			} while (!leftColor.equals(rightColor));
-			System.out.println("flag2");
 			//check if the detected colour is a victim
-			System.out.println("flag3");
 			try {
 				//Tell the jason enviroment that a patient is found at X,Y and its colour.
 				PrintWriter out = new PrintWriter(agentClient.getOutputStream(), true);
@@ -76,30 +77,28 @@ public class SelectDestinationBehavior implements Behavior {
 				out.println(grid.getCurrentCell().getCoordinates().x + ","
 							+ grid.getCurrentCell().getCoordinates().y + ","
 							+ leftColor.toLowerCase());
-				System.out.println("flag4");
 				BufferedReader in = new BufferedReader(new InputStreamReader(agentClient.getInputStream()));
 				//wait for agent response
 				while (!in.ready()) {
 					Thread.sleep(1000);
 				}
 				String paramedicResponse = in.readLine();
-				System.out.println("flag5");
 				//check response and respond accordingly
 				if (paramedicResponse.equals("NotCritical")) {
 					//Not urgent
 					Sound.beep();
 					grid.getCurrentCell().setStatus(2);
 				} else if (paramedicResponse.equals("Critical")) {
-					System.out.println("flag6");
 				//urgent
+					led.setPattern(8);
 					Sound.twoBeeps();
 					grid.getCurrentCell().setStatus(4);
 					route.clear();
 					pathFinder.findPath(path, grid.getCurrentCell(), grid.getCell(0, 0));
 					destination = grid.getCell(0, 0);
-					System.out.println("flag7");
 				} else if (paramedicResponse.equals("NoVictim")) {
 					//no victim
+					led.setPattern(4);
 					Sound.buzz();
 					grid.getCurrentCell().setStatus(0);
 				}
@@ -146,11 +145,13 @@ public class SelectDestinationBehavior implements Behavior {
 				} else {
 					// pick up non-urgent victim
 					if (nonUrgentVictims.contains(grid.getCurrentCell())) {
+						led.setPattern(9);
 						grid.getCurrentCell().setStatus(3);
 						route.clear();
 						
 					// travel to non-urgent victim
 					} else {
+						led.setPattern(4);
 						hungarianMethod = new HungarianMethod(grid, nonUrgentVictims);
 						route = hungarianMethod.findRoute();
 					}
@@ -158,6 +159,7 @@ public class SelectDestinationBehavior implements Behavior {
 				
 			// dropped urgent victims off at this hospital
 			} else if (route.isEmpty()) {
+				led.setPattern(4);
 				hungarianMethod = new HungarianMethod(grid, potentialVictims);
 				route = hungarianMethod.findRoute();
 			}
@@ -165,7 +167,10 @@ public class SelectDestinationBehavior implements Behavior {
 			destination = route.isEmpty() ? grid.getCell(0, 0) : route.remove(0);
 			pathFinder.findPath(path, grid.getCurrentCell(), destination);
 		}
-		
+		//wipe screen
+	    for (int i = 0; i < 8; i++) {
+	    	System.out.println("");
+	    }
 		pcMonitor.setRoute(route);
 		pcMonitor.setPath(path);
 		pcMonitor.setDestination(destination);

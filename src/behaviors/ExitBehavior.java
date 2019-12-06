@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import lejos.hardware.BrickFinder;
 import lejos.hardware.Button;
 import lejos.hardware.Sound;
 import lejos.robotics.subsumption.Behavior;
@@ -46,6 +47,7 @@ public class ExitBehavior implements Behavior{
 		suppressed = false;
 		
 		Sound.beepSequence();
+		BrickFinder.getLocal().getLED().setPattern(1);
 		Button.waitForAnyPress();
 		
 		pilotMonitor.terminate();

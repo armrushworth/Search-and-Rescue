@@ -14,6 +14,7 @@ import behaviors.Localiser;
 import behaviors.MoveBehavior;
 import behaviors.SelectDestinationBehavior;
 import colourSensorModel.ColourSampleChart;
+import lejos.hardware.BrickFinder;
 import lejos.hardware.Sound;
 import lejos.robotics.subsumption.Arbitrator;
 import lejos.robotics.subsumption.Behavior;
@@ -24,14 +25,14 @@ public class Main {
 	private static final int PORT = 1234; // server port between pc client and robot
 	private static ServerSocket server; // server socket used between robot and pc client.
 	private static boolean useColourChart = true;
-	private static boolean useLocalise = true;
+	private static boolean useLocalise = false;
 	private static ArrayList<Cell> route = new ArrayList<Cell>();
 	private static ArrayList<Cell> path = new ArrayList<Cell>();
 	private static ArrayList<Cell> potentialVictims = new ArrayList<Cell>();
 	
 	public static void main(String[] args) {
 		//prevents really annoying bugs when comparing labelled colour samples.
-	    System.setProperty("java.util.Arrays.useLegacyMergeSort", "true");
+	    System.setProperty("java.util.Arrays.useLegacy/MergeSort", "true");
 	    Socket agentClient = null;
 		// Initialise the grid and robot
 		Grid grid = new Grid();
@@ -53,10 +54,9 @@ public class Main {
 		// start the pc monitor
 		PCMonitor pcMonitor = null;
 		try {
-			System.out.println("Awaiting client 1..");
+			BrickFinder.getLocal().getLED().setPattern(1);
 			server = new ServerSocket(PORT);
 			Socket client = server.accept();
-			System.out.println("Awaiting client 2..");
 			ServerSocket errorServer = new ServerSocket(1111);
 			Socket errorClient = errorServer.accept();
 			
@@ -79,7 +79,6 @@ public class Main {
 		myMonitor.start();
 		Cell[] obstacles = null;
 		try {
-			System.out.println("Awaiting client 3..");
 			ServerSocket agentServer = new ServerSocket(1235);
 			agentClient = agentServer.accept();
 			BufferedReader in = new BufferedReader(new InputStreamReader(agentClient.getInputStream()));

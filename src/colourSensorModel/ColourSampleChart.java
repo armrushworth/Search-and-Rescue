@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import lejos.hardware.BrickFinder;
 import lejos.hardware.Button;
 import lejos.hardware.lcd.GraphicsLCD;
 import main.PilotRobot;
@@ -245,6 +246,7 @@ public class ColourSampleChart {
    * Every time a new data is collected for a fresh colour graph it gets saved to a text file.
    */
   public void saveChartToFile(Boolean leftSensor) {
+	  BrickFinder.getLocal().getLED().setPattern(5);
     try {
       //Overwrite (Left|Right)ColourChart.txt.
       PrintWriter writer = null;
