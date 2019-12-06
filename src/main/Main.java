@@ -65,7 +65,7 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		pcMonitor.start();
+		
 		if (csc.recentError != null) {
 			pcMonitor.sendError(csc.recentError);
 		}
@@ -111,7 +111,7 @@ public class Main {
 			pcMonitor.sendError(e);
 			e.printStackTrace();
 		}
-		
+		pcMonitor.start();
 //		Localiser l = new Localiser(myRobot, obstacles, grid, csc);
 //		l.localise();
 		

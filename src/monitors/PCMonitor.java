@@ -144,7 +144,7 @@ public class PCMonitor extends Thread {
 			// ouptut victim information for the map
 			String potentialVictimsOutput = "";
 			for (Cell potentialVictim : potentialVictims) {
-				potentialVictimsOutput += potentialVictim.toString() + "," + potentialVictim.getStatus();
+				potentialVictimsOutput += potentialVictim.toString() + "," + potentialVictim.getStatus() + ",";
 			}
 			out.println(potentialVictimsOutput);
 			

@@ -43,15 +43,6 @@ public class ColourSampleChart {
   //TODO This is to be replace with however the robot collects colour samples.
   private PilotRobot pilotRobot;
   
-  //Robot lcd screen display
-  private GraphicsLCD lcd;
-  
-  //A list containing the colour labels of a new samples k nearest neighbours.
-  private int[] nearestColours;
-  
-  //A list containing the vector distance of a new samples k nearest neighbours.
-  private double[] nearestDistances;
-  
   //The number of separate readings needed per colour
   private final int noOfScans = 8; 
   

@@ -19,6 +19,9 @@ public class PCClient extends Thread {
 	private JLabel[] robotStates = new JLabel[36];
 	private ImageIcon robotIcon;
 	private ImageIcon empty;
+	private ImageIcon unknown;
+	private ImageIcon victim;
+	private ImageIcon obstacle;
 	
 	@Override
 	public void run() {
@@ -148,39 +151,41 @@ public class PCClient extends Thread {
 			
 			// update display grid with robot position
 			String currentCell = in.readLine();
-			Point currentCellCoordinates = new Point(Integer.parseInt(currentCell.split(",")[0]), Integer.parseInt(currentCell.split(",")[1]))
+			Point currentCellCoordinates = new Point(Integer.parseInt(currentCell.split(",")[0]), Integer.parseInt(currentCell.split(",")[1]));
 			
 			// update display grid with victim information
-			String[] potentialVictimsInput = in.readLine().Split(',');
-			String[][] potentialVictims = new String[5][3]
+			String input = in.readLine();
+			String[] potentialVictimsInput = input.split(",");
+			
+			int[][] potentialVictims = new int[5][3];
 			for (int i = 0; i < 5; i++) {
-				potentialVictims[i][0] = potentialVictimsInput[i * 3 + 0];
-				potentialVictims[i][1] = potentialVictimsInput[i * 3 + 1];;
-				potentialVictims[i][2] = potentialVictimsInput[i * 3 + 2];;
+				potentialVictims[i][0] = Integer.parseInt(potentialVictimsInput[i * 3 + 0]);
+				potentialVictims[i][1] = Integer.parseInt(potentialVictimsInput[i * 3 + 1]);
+				potentialVictims[i][2] = Integer.parseInt(potentialVictimsInput[i * 3 + 2]);
 			}
 			
 			for (int i = 0; i < robotStates.length; i++) {
 				if (i == currentCellCoordinates.x + (5 - currentCellCoordinates.y) * 6) {
 					robotStates[i].setIcon(robotIcon);
-				} else if (i == potentialVictims[0][0] + (5 -potentialVictims[0][1]) * 6 && potentialVictims[0][2] == "1") {
+				} else if (i == potentialVictims[0][0] + (5 - potentialVictims[0][1]) * 6 && potentialVictims[0][2] == 1) {
 					robotStates[i].setIcon(unknown);
-				} else if (i == potentialVictims[1][0] + (5 -potentialVictims[1][1]) * 6 && potentialVictims[1][2] == "1") {
+				} else if (i == potentialVictims[1][0] + (5 - potentialVictims[1][1]) * 6 && potentialVictims[1][2] == 1) {
 					robotStates[i].setIcon(unknown);
-				} else if (i == potentialVictims[2][0] + (5 -potentialVictims[1][1]) * 6 && potentialVictims[2][2] == "1") {
+				} else if (i == potentialVictims[2][0] + (5 - potentialVictims[2][1]) * 6 && potentialVictims[2][2] == 1) {
 					robotStates[i].setIcon(unknown);
-				} else if (i == potentialVictims[3][0] + (5 -potentialVictims[1][1]) * 6 && potentialVictims[3][2] == "1") {
+				} else if (i == potentialVictims[3][0] + (5 - potentialVictims[3][1]) * 6 && potentialVictims[3][2] == 1) {
 					robotStates[i].setIcon(unknown);
-				} else if (i == potentialVictims[4][0] + (5 -potentialVictims[1][1]) * 6 && potentialVictims[4][2] == "1") {
+				} else if (i == potentialVictims[4][0] + (5 - potentialVictims[4][1]) * 6 && potentialVictims[4][2] == 1) {
 					robotStates[i].setIcon(unknown);
-				} else if (i == potentialVictims[0][0] + (5 -potentialVictims[0][1]) * 6 && potentialVictims[0][2] == "2") {
+				} else if (i == potentialVictims[0][0] + (5 - potentialVictims[0][1]) * 6 && potentialVictims[0][2] == 2) {
 					robotStates[i].setIcon(victim);
-				} else if (i == potentialVictims[1][0] + (5 -potentialVictims[1][1]) * 6 && potentialVictims[1][2] == "2") {
+				} else if (i == potentialVictims[1][0] + (5 - potentialVictims[1][1]) * 6 && potentialVictims[1][2] == 2) {
 					robotStates[i].setIcon(victim);
-				} else if (i == potentialVictims[2][0] + (5 -potentialVictims[1][1]) * 6 && potentialVictims[2][2] == "2") {
+				} else if (i == potentialVictims[2][0] + (5 - potentialVictims[2][1]) * 6 && potentialVictims[2][2] == 2) {
 					robotStates[i].setIcon(victim);
-				} else if (i == potentialVictims[3][0] + (5 -potentialVictims[1][1]) * 6 && potentialVictims[3][2] == "2") {
+				} else if (i == potentialVictims[3][0] + (5 - potentialVictims[3][1]) * 6 && potentialVictims[3][2] == 2) {
 					robotStates[i].setIcon(victim);
-				} else if (i == potentialVictims[4][0] + (5 -potentialVictims[1][1]) * 6 && potentialVictims[4][2] == "2") {
+				} else if (i == potentialVictims[4][0] + (5 - potentialVictims[4][1]) * 6 && potentialVictims[4][2] == 2) {
 					robotStates[i].setIcon(victim);
 				} else {
 					robotStates[i].setIcon(empty);
