@@ -168,10 +168,10 @@ public class PCClient extends Thread {
 			input = in.readLine();
 			String[] obstaclesInput = input.split(",");
 			
-			int[][] obstacles = new int[4][2]
+			int[][] obstacles = new int[4][2];
 			for (int i = 0; i < 4; i++) {
-				obstacles[i][0] = Integer.parseInt(potentialVictimsInput[i * 2 + 0]);
-				obstacles[i][1] = Integer.parseInt(potentialVictimsInput[i * 2 + 1]);
+				obstacles[i][0] = Integer.parseInt(obstaclesInput[i * 2 + 0]);
+				obstacles[i][1] = Integer.parseInt(obstaclesInput[i * 2 + 1]);
 			}
 			
 			for (int i = 0; i < robotStates.length; i++) {
