@@ -145,6 +145,7 @@ public class SelectDestinationBehavior implements Behavior {
 				} else {
 					// pick up non-urgent victim
 					if (nonUrgentVictims.contains(grid.getCurrentCell())) {
+						Sound.twoBeeps();
 						led.setPattern(9);
 						grid.getCurrentCell().setStatus(3);
 						route.clear();

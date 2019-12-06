@@ -164,9 +164,27 @@ public class PCClient extends Thread {
 				potentialVictims[i][2] = Integer.parseInt(potentialVictimsInput[i * 3 + 2]);
 			}
 			
+			// update display with obstacles
+			input = in.readLine();
+			String[] obstaclesInput = input.split(",");
+			
+			int[][] obstacles = new int[4][2]
+			for (int i = 0; i < 4; i++) {
+				obstacles[i][0] = Integer.parseInt(potentialVictimsInput[i * 2 + 0]);
+				obstacles[i][1] = Integer.parseInt(potentialVictimsInput[i * 2 + 1]);
+			}
+			
 			for (int i = 0; i < robotStates.length; i++) {
 				if (i == currentCellCoordinates.x + (5 - currentCellCoordinates.y) * 6) {
 					robotStates[i].setIcon(robotIcon);
+				} else if (i == obstacles[0][0] + (5 - obstacles[0][1]) * 6) {
+					robotStates[i].setIcon(obstacle);
+				} else if (i == obstacles[1][0] + (5 - obstacles[1][1]) * 6) {
+					robotStates[i].setIcon(obstacle);
+				} else if (i == obstacles[2][0] + (5 - obstacles[2][1]) * 6) {
+					robotStates[i].setIcon(obstacle);
+				} else if (i == obstacles[3][0] + (5 - obstacles[3][1]) * 6) {
+					robotStates[i].setIcon(obstacle);
 				} else if (i == potentialVictims[0][0] + (5 - potentialVictims[0][1]) * 6 && potentialVictims[0][2] == 1) {
 					robotStates[i].setIcon(unknown);
 				} else if (i == potentialVictims[1][0] + (5 - potentialVictims[1][1]) * 6 && potentialVictims[1][2] == 1) {
