@@ -32,8 +32,8 @@ public class Main {
 	
 	public static void main(String[] args) {
 		//prevents really annoying bugs when comparing labelled colour samples.
-	    System.setProperty("java.util.Arrays.useLegacy/MergeSort", "true");
-	    Socket agentClient = null;
+		System.setProperty("java.util.Arrays.useLegacy/MergeSort", "true");
+		Socket agentClient = null;
 		// Initialise the grid and robot
 		Grid grid = new Grid();
 		PilotRobot myRobot = new PilotRobot();
@@ -50,11 +50,12 @@ public class Main {
 			csc = new ColourSampleChart(myRobot);
 		}
 		
-		
 		// start the pc monitor
 		PCMonitor pcMonitor = null;
 		try {
 			BrickFinder.getLocal().getLED().setPattern(1);
+			Sound.beepSequenceUp();
+			
 			server = new ServerSocket(PORT);
 			Socket client = server.accept();
 			ServerSocket errorServer = new ServerSocket(1111);
@@ -68,7 +69,6 @@ public class Main {
 		if (csc.recentError != null) {
 			pcMonitor.sendError(csc.recentError);
 		}
-
 		
 		if (!useColourChart) {
 			myRobot.resetGyro();
@@ -82,10 +82,10 @@ public class Main {
 			ServerSocket agentServer = new ServerSocket(1235);
 			agentClient = agentServer.accept();
 			BufferedReader in = new BufferedReader(new InputStreamReader(agentClient.getInputStream()));
-		    Cell[] victims = new Cell[5];
-		    obstacles = new Cell[4];
-		    Cell hospital;
-		    String coords;
+			Cell[] victims = new Cell[5];
+			obstacles = new Cell[4];
+			Cell hospital;
+			String coords;
 			for (int i = 0; i < victims.length; i++) {
 				coords = in.readLine();
 				int x = Integer.parseInt(coords.split(",")[0]);
@@ -112,58 +112,9 @@ public class Main {
 			e.printStackTrace();
 		}
 		
-		// TODO replace with AgentSpeak logic
-//		int bayNumber = 4;
-//		switch (bayNumber) {
-//			case 1:
-//				grid.getCell(1, 1).setIsBlocked();
-//				grid.getCell(1, 4).setIsBlocked();
-//				grid.getCell(4, 1).setIsBlocked();
-//				grid.getCell(4, 4).setIsBlocked();
-//				grid.getCell(0, 5).setStatus(1);
-//				grid.getCell(2, 0).setStatus(1);
-//				grid.getCell(2, 2).setStatus(1);
-//				grid.getCell(2, 4).setStatus(1);
-//				grid.getCell(5, 4).setStatus(1);
-//				break;
-//			case 2:
-//				grid.getCell(1, 3).setIsBlocked();
-//				grid.getCell(1, 5).setIsBlocked();
-//				grid.getCell(2, 4).setIsBlocked();
-//				grid.getCell(3, 3).setIsBlocked();
-//				grid.getCell(0, 5).setStatus(1);
-//				grid.getCell(2, 3).setStatus(1);
-//				grid.getCell(2, 5).setStatus(1);
-//				grid.getCell(3, 1).setStatus(1);
-//				grid.getCell(5, 5).setStatus(1);
-//				break;
-//			case 3:
-//				grid.getCell(2, 2).setIsBlocked();
-//				grid.getCell(3, 2).setIsBlocked();
-//				grid.getCell(4, 3).setIsBlocked();
-//				grid.getCell(5, 0).setIsBlocked();
-//				grid.getCell(0, 2).setStatus(1);
-//				grid.getCell(1, 5).setStatus(1);
-//				grid.getCell(2, 3).setStatus(1);
-//				grid.getCell(4, 5).setStatus(1);
-//				grid.getCell(5, 1).setStatus(1);
-//				break;
-//			case 4:
-//				grid.getCell(0, 3).setIsBlocked();
-//				grid.getCell(1, 2).setIsBlocked();
-//				grid.getCell(1, 4).setIsBlocked();
-//				grid.getCell(3, 3).setIsBlocked();
-//				grid.getCell(0, 2).setStatus(1);
-//				grid.getCell(0, 4).setStatus(1);
-//				grid.getCell(1, 3).setStatus(1);
-//				grid.getCell(4, 3).setStatus(1);
-//				grid.getCell(5, 5).setStatus(1);
-//		}
-		
-		
 //		Localiser l = new Localiser(myRobot, obstacles, grid, csc);
 //		l.localise();
-		Sound.beepSequenceUp();
+		
 		// set up the behaviours for the arbitrator and construct it
 		Behavior b1 = new MoveBehavior(myRobot, grid, path, csc);
 		Behavior b2 = new SelectDestinationBehavior(myRobot, agentClient, pcMonitor, csc, grid, route, path);

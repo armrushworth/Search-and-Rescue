@@ -1,4 +1,5 @@
 package monitors;
+
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
@@ -94,7 +95,7 @@ public class PCMonitor extends Thread {
 				}
 				out.println(pathOutput.substring(0, pathOutput.length() - 2));
 			} else {
-				out.println(destination != null ? "(" + destination.getCoordinates().x + ", " + destination.getCoordinates().y + "), " : "null");
+				out.println(destination != null ? "(" + destination.getCoordinates().x + ", " + destination.getCoordinates().y + ")" : "null");
 			}
 			
 			// output the route
@@ -105,7 +106,7 @@ public class PCMonitor extends Thread {
 				}
 				out.println(routeOutput.substring(0, routeOutput.length() - 2));
 			} else {
-				out.println(destination != null ? "(" + destination.getCoordinates().x + ", " + destination.getCoordinates().y + "), " : "null");
+				out.println(destination != null ? "(" + destination.getCoordinates().x + ", " + destination.getCoordinates().y + ")" : "null");
 			}
 			
 			// output sensor information
@@ -137,7 +138,16 @@ public class PCMonitor extends Thread {
 					out.println("South");
 			}
 			
+			// output the current location of the robot
 			out.println(grid.getCurrentCell().getCoordinates().x + "," + grid.getCurrentCell().getCoordinates().y);
+			
+			// ouptut victim information for the map
+			String potentialVictimsOutput = "";
+			for (Cell potentialVictim : potentialVictims) {
+				potentialVictimsOutput += potentialVictim.toString() + "," + potentialVictim.getStatus();
+			}
+			out.println(potentialVictimsOutput);
+			
 			out.flush();
 			
 			try {
